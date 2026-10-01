@@ -79,12 +79,12 @@ const BackgroundShader = () => {
           float n1 = fbm(p1);
           float n2 = fbm(p2 + n1 * 1.2);
           
-          // Deep luxurious dark burgundy background
-          vec3 spaceBg = mix(vec3(0.02, 0.004, 0.005), vec3(0.08, 0.01, 0.015), uv.y);
+          // Deep luxurious dark wine & midnight espresso background
+          vec3 spaceBg = mix(vec3(0.07, 0.05, 0.06), vec3(0.14, 0.08, 0.10), uv.y);
           
-          // Soft cloud gas layers
-          vec3 colorNebula1 = vec3(0.18, 0.02, 0.04) * n1; // Deep rose/burgundy cloud
-          vec3 colorNebula2 = vec3(0.35, 0.22, 0.08) * n2 * 0.4; // Soft golden cloud
+          // Soft cloud gas layers in dusty rose & champagne gold
+          vec3 colorNebula1 = vec3(0.35, 0.16, 0.21) * n1 * 0.45; // Deep wine / rose cloud
+          vec3 colorNebula2 = vec3(0.40, 0.32, 0.22) * n2 * 0.35; // Soft champagne cloud
           
           vec3 finalColor = spaceBg + colorNebula1 + colorNebula2;
           
@@ -93,57 +93,57 @@ const BackgroundShader = () => {
           vec2 toSource = uv - raySource;
           float angle = atan(toSource.y, toSource.x);
           float distToSource = length(toSource);
-          float rayPattern = sin(angle * 12.0 + t * 0.8) * 0.5 + 0.5;
-          rayPattern += sin(angle * 26.0 - t * 0.5) * 0.25 + 0.25;
+          float rayPattern = sin(angle * 14.0 + t * 0.7) * 0.5 + 0.5;
+          rayPattern += sin(angle * 28.0 - t * 0.4) * 0.25 + 0.25;
           rayPattern *= smoothstep(1.5, 0.0, distToSource);
-          vec3 rayColor = vec3(0.95, 0.82, 0.55) * rayPattern * 0.05;
+          vec3 rayColor = vec3(0.79, 0.66, 0.54) * rayPattern * 0.04;
           finalColor += rayColor;
           
-          // 3. Moving Bokeh Lights (Warm Gold/Amber)
-          float b1 = smoothstep(0.18, 0.0, length(uv - vec2(0.25 + 0.08*sin(t*0.5), 0.35 + 0.08*cos(t*0.7))));
-          float b2 = smoothstep(0.25, 0.0, length(uv - vec2(0.8 + 0.05*cos(t*0.4), 0.65 + 0.06*sin(t*0.6))));
-          float b3 = smoothstep(0.15, 0.0, length(uv - vec2(0.5 + 0.1*sin(t*0.3), 0.15 + 0.05*cos(t*0.5))));
-          finalColor += vec3(0.95, 0.8, 0.45) * b1 * 0.06;
-          finalColor += vec3(0.9, 0.72, 0.4) * b2 * 0.05;
-          finalColor += vec3(0.98, 0.85, 0.55) * b3 * 0.07;
+          // 3. Moving Bokeh Lights (Warm Champagne & Dusty Rose)
+          float b1 = smoothstep(0.20, 0.0, length(uv - vec2(0.25 + 0.08*sin(t*0.5), 0.35 + 0.08*cos(t*0.7))));
+          float b2 = smoothstep(0.28, 0.0, length(uv - vec2(0.8 + 0.05*cos(t*0.4), 0.65 + 0.06*sin(t*0.6))));
+          float b3 = smoothstep(0.18, 0.0, length(uv - vec2(0.5 + 0.1*sin(t*0.3), 0.15 + 0.05*cos(t*0.5))));
+          finalColor += vec3(0.79, 0.66, 0.54) * b1 * 0.05;
+          finalColor += vec3(0.55, 0.35, 0.39) * b2 * 0.04;
+          finalColor += vec3(0.97, 0.95, 0.92) * b3 * 0.04;
           
-          // 4. Double-layered Floating Golden Particles (80 Stars)
-          for(float i = 0.0; i < 80.0; i++) {
+          // 4. Double-layered Floating Champagne Particles (60 Stars)
+          for(float i = 0.0; i < 60.0; i++) {
               float hashX = hash(vec2(i, 11.53));
               float hashY = hash(vec2(i, 45.21));
               
               vec2 starPos = vec2(hashX, hashY);
               
               // Drift particles upward slowly
-              float speed = 0.008 + 0.015 * hash(vec2(i, 83.1));
+              float speed = 0.005 + 0.012 * hash(vec2(i, 83.1));
               starPos.y = fract(starPos.y - u_time * speed);
-              starPos.x = fract(starPos.x + 0.015 * sin(u_time * 0.1 + i));
+              starPos.x = fract(starPos.x + 0.012 * sin(u_time * 0.1 + i));
               
               // Push particles away from cursor
               float starMouseDist = length(starPos - ndcMouse);
-              if (starMouseDist < 0.28) {
-                  float push = (0.28 - starMouseDist) * 0.15;
+              if (starMouseDist < 0.25) {
+                  float push = (0.25 - starMouseDist) * 0.12;
                   starPos += normalize(starPos - ndcMouse + 0.0001) * push;
               }
               
               float dist = length(uv - starPos);
               
               // Distinguish background (tiny, dim) vs foreground (larger, bright)
-              float isForeground = step(40.0, i); 
-              float baseSize = mix(0.0002, 0.0007, isForeground);
-              float size = baseSize + 0.0004 * hash(vec2(i, 29.7));
+              float isForeground = step(30.0, i); 
+              float baseSize = mix(0.0002, 0.0006, isForeground);
+              float size = baseSize + 0.0003 * hash(vec2(i, 29.7));
               
               // Twinkle sparkles
-              float pulseSpeed = mix(0.8, 2.5, hash(vec2(i, 92.4)));
+              float pulseSpeed = mix(0.6, 2.0, hash(vec2(i, 92.4)));
               float pulse = 0.3 + 0.7 * sin(u_time * pulseSpeed + i * 3.0);
               
               // Volumetric falloff glow
-              float glow = size / (dist + 0.0005);
+              float glow = size / (dist + 0.0006);
               
-              // Cinematic gold colors
+              // Cinematic gold & ivory colors
               vec3 starColor = mix(
-                  vec3(1.0, 0.78, 0.42), // Rich gold/amber
-                  vec3(1.0, 0.95, 0.8),  // Bright champagne
+                  vec3(0.79, 0.66, 0.54), // Muted gold (#C9A98A)
+                  vec3(0.97, 0.95, 0.92), // Warm ivory (#F8F3EC)
                   hash(vec2(i, 63.8))
               );
               
@@ -151,13 +151,13 @@ const BackgroundShader = () => {
           }
           
           // 5. Film Grain / Subtle Noise
-          float grain = hash(uv + fract(sin(u_time))) * 0.015;
+          float grain = hash(uv + fract(sin(u_time))) * 0.012;
           finalColor += vec3(grain);
           
           // 6. Soft Vignette Shadow
           float vignette = uv.x * uv.y * (1.0 - uv.x) * (1.0 - uv.y);
-          vignette = clamp(pow(16.0 * vignette, 0.45), 0.0, 1.0);
-          finalColor *= mix(0.4, 1.0, vignette);
+          vignette = clamp(pow(16.0 * vignette, 0.5), 0.0, 1.0);
+          finalColor *= mix(0.35, 1.0, vignette);
           
           gl_FragColor = vec4(clamp(finalColor, 0.0, 1.0), 1.0);
       }

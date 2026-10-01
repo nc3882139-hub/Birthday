@@ -18,6 +18,7 @@ const OurStory = ({ onReplay }) => {
   const [activeSection, setActiveSection] = useState('beginning');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [poppedWishes, setPoppedWishes] = useState([]);
+  const [isEnvelopeClicked, setIsEnvelopeClicked] = useState(false);
   const [isLetterOpened, setIsLetterOpened] = useState(false);
   const [typewrittenText, setTypewrittenText] = useState('');
   const [showHeartFinale, setShowHeartFinale] = useState(false);
@@ -29,14 +30,21 @@ const OurStory = ({ onReplay }) => {
   const wishesRef = useRef(null);
   const finaleRef = useRef(null);
 
-  const letterText = "Every moment spent together has been a chapter in a beautiful story. As we celebrate you today, know that my greatest wish is for your happiness to shine as brightly as you do. Thank you for being you.\n\nWith all my love.";
+  const letterText = "Every moment spent together has been a chapter in a beautiful story. As we celebrate you today, know that my greatest wish is for your happiness to shine as brightly as you do. Thank you for being you.";
 
-  // Wishes for balloons
+  // Multi-layered wish balloons with varied colors & depths
   const initialWishes = [
-    { id: 1, text: "May all your dreams take flight this year.", left: 15, delay: 0.2, duration: 5.5 },
-    { id: 2, text: "Wishing you a year filled with endless laughter.", left: 38, delay: 0.8, duration: 6.2 },
-    { id: 3, text: "To a beautiful soul, happy birthday.", left: 62, delay: 0.4, duration: 4.8 },
-    { id: 4, text: "May love surround you always.", left: 83, delay: 1.1, duration: 5.8 }
+    { id: 1, text: "May all your dreams take flight this year.", left: 14, delay: 0.2, duration: 7.2, color: 'dusty-rose', depth: 'mg' },
+    { id: 2, text: "Wishing you a year filled with endless laughter.", left: 34, delay: 0.8, duration: 6.5, color: 'champagne', depth: 'mg' },
+    { id: 3, text: "To a beautiful soul, happy birthday.", left: 64, delay: 0.4, duration: 7.8, color: 'burgundy', depth: 'mg' },
+    { id: 4, text: "May love surround you always.", left: 84, delay: 1.1, duration: 6.8, color: 'blush', depth: 'mg' },
+    // Background framing balloons
+    { id: 5, text: "", left: 8, delay: 1.5, duration: 8.5, color: 'cream', depth: 'bg' },
+    { id: 6, text: "", left: 48, delay: 0.5, duration: 9.0, color: 'wine', depth: 'bg' },
+    { id: 7, text: "", left: 90, delay: 2.0, duration: 8.0, color: 'champagne', depth: 'bg' },
+    // Foreground framing balloons
+    { id: 8, text: "", left: 4, delay: 2.2, duration: 6.2, color: 'dusty-rose', depth: 'fg' },
+    { id: 9, text: "", left: 94, delay: 1.7, duration: 6.6, color: 'cream', depth: 'fg' }
   ];
   
   const [balloons, setBalloons] = useState(initialWishes);
@@ -45,7 +53,6 @@ const OurStory = ({ onReplay }) => {
   useEffect(() => {
     const refs = [
       { id: 'beginning', ref: beginningRef },
-      { id: 'growing-up', ref: beginningRef },
       { id: 'memories', ref: memoriesRef },
       { id: 'wishes', ref: wishesRef },
       { id: 'finale', ref: finaleRef }
@@ -82,7 +89,7 @@ const OurStory = ({ onReplay }) => {
 
   const handleNavigate = (targetId) => {
     let targetRef;
-    if (targetId === 'beginning' || targetId === 'growing-up') {
+    if (targetId === 'beginning') {
       targetRef = beginningRef;
     } else if (targetId === 'memories') {
       targetRef = memoriesRef;
@@ -93,7 +100,7 @@ const OurStory = ({ onReplay }) => {
     }
 
     if (targetRef && targetRef.current) {
-      const yOffset = -120;
+      const yOffset = -100;
       const element = targetRef.current;
       const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
       window.scrollTo({ top: y, behavior: 'smooth' });
@@ -102,51 +109,58 @@ const OurStory = ({ onReplay }) => {
   };
 
   const handleBalloonPop = (id, text, x, y) => {
-    setPoppedWishes((prev) => [...prev, { id, text, x, y }]);
+    if (text) {
+      setPoppedWishes((prev) => [...prev, { id, text, x, y }]);
+    }
     setBalloons((prev) => prev.filter((b) => b.id !== id));
   };
 
-  const handleOpenLetter = () => {
-    if (isLetterOpened) return;
+  const handleOpenLetterSequence = () => {
+    if (isEnvelopeClicked) return;
     playTick();
     
-    // Auto start chord synth audio progression if not already playing
     if (!isPlaying) {
       togglePlay();
     }
     
-    setIsLetterOpened(true);
-    setIsTyping(true);
-    setTypewrittenText('');
-    setShowHeartFinale(false);
+    setIsEnvelopeClicked(true);
 
-    let charIndex = 0;
-    const speed = 40;
+    // Sequence: 1. Envelope Flap opens -> 2. Letter Slides Out -> 3. Typewriter starts
+    setTimeout(() => {
+      setIsLetterOpened(true);
+      setIsTyping(true);
+      setTypewrittenText('');
+      setShowHeartFinale(false);
 
-    const typeWriter = () => {
-      if (charIndex < letterText.length) {
-        const char = letterText.charAt(charIndex);
-        setTypewrittenText((prev) => prev + char);
-        charIndex++;
-        setTimeout(typeWriter, speed);
-      } else {
-        setIsTyping(false);
-        setTimeout(() => {
-          setShowHeartFinale(true);
-        }, 550);
-      }
-    };
+      let charIndex = 0;
+      const speed = 35;
 
-    setTimeout(typeWriter, 700);
+      const typeWriter = () => {
+        if (charIndex < letterText.length) {
+          const char = letterText.charAt(charIndex);
+          setTypewrittenText((prev) => prev + char);
+          charIndex++;
+          setTimeout(typeWriter, speed);
+        } else {
+          setIsTyping(false);
+          setTimeout(() => {
+            setShowHeartFinale(true);
+          }, 600);
+        }
+      };
+
+      setTimeout(typeWriter, 600);
+    }, 900);
   };
 
   const handleReplayJourney = () => {
     playTick();
     if (isPlaying) {
-      togglePlay(); // stop audio synth
+      togglePlay();
     }
     setBalloons(initialWishes);
     setPoppedWishes([]);
+    setIsEnvelopeClicked(false);
     setIsLetterOpened(false);
     setTypewrittenText('');
     setShowHeartFinale(false);
@@ -155,7 +169,7 @@ const OurStory = ({ onReplay }) => {
 
   return (
     <div className="relative min-h-screen">
-      {/* Navigation Headers */}
+      {/* Top and Side Navbars */}
       <TopNavbar
         activeSection={activeSection}
         onToggleMenu={() => setIsMobileMenuOpen(true)}
@@ -173,47 +187,57 @@ const OurStory = ({ onReplay }) => {
       />
 
       {/* Main Content Layout */}
-      <main className="relative z-10 pt-[140px] pb-stack-xl lg:pr-80">
-        {/* Decorative Balloon Cluster */}
-        <div className="pointer-events-none hidden xl:block absolute right-0 top-24 h-[calc(100vh-12rem)] w-96 overflow-visible z-0">
-          <div className="absolute right-4 top-4 w-28 h-36 rounded-full bg-gradient-to-b from-[#f7e5b1] via-[#f6c15d] to-[#b88c4a] shadow-[0_20px_60px_rgba(0,0,0,0.32)] opacity-95 transform-gpu animate-[float_12s_ease-in-out_infinite]" />
-          <div className="absolute right-14 top-24 w-20 h-28 rounded-full bg-gradient-to-b from-[#fff9ef] via-[#f8e8cf] to-[#f2dca5] border border-white/10 shadow-[0_18px_45px_rgba(0,0,0,0.25)] opacity-90 transform-gpu animate-[float_10s_ease-in-out_infinite]" />
-          <div className="absolute right-10 top-52 w-24 h-32 rounded-full bg-gradient-to-b from-[#e6c068] via-[#ffde96] to-[#f8d580] shadow-[0_22px_58px_rgba(0,0,0,0.32)] opacity-95 transform-gpu animate-[float_14s_ease-in-out_infinite]" />
-          <div className="absolute right-28 top-44 w-14 h-20 rounded-full bg-gradient-to-b from-[#fffdf6] via-[#fff4df] to-[#ffe8c1] border border-white/15 shadow-[0_12px_26px_rgba(0,0,0,0.22)] opacity-90" />
-          <div className="absolute right-20 top-72 w-32 h-40 rounded-full bg-gradient-to-b from-[#f8e8cf] via-[#f6c15d] to-[#cda25f] shadow-[0_24px_70px_rgba(0,0,0,0.28)] opacity-90" />
-          <div className="absolute right-14 top-28 w-1 h-20 bg-gradient-to-b from-[#f7d87a] to-[#6c4a1b] rounded-full opacity-60 rotate-6" />
-          <div className="absolute right-20 top-56 w-1 h-24 bg-gradient-to-b from-[#f7d87a] to-[#6c4a1b] rounded-full opacity-60 -rotate-3" />
-        </div>
-
+      <main className="relative z-10 pt-[120px] pb-24 lg:pr-72">
         {/* Scroll Anchor */}
         <div ref={beginningRef} id="beginning" className="h-0 w-0 pointer-events-none" />
+
+        {/* Hero Welcome Header */}
+        <section className="mb-24 px-margin-mobile md:px-margin-desktop text-center relative max-w-4xl mx-auto select-none">
+          <motion.p 
+            initial={{ opacity: 0, letterSpacing: '0.15em' }}
+            animate={{ opacity: 0.8, letterSpacing: '0.25em' }}
+            transition={{ duration: 1.4 }}
+            className="font-sans text-xs md:text-sm text-gold uppercase tracking-[0.25em] mb-4"
+          >
+            A Celebration of Moments
+          </motion.p>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.8, delay: 0.2 }}
+            className="font-serif text-5xl sm:text-6xl md:text-7xl text-parchment text-shimmer mb-5 font-semibold leading-tight"
+          >
+            Treasured Memories & Wishes
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 0.9, y: 0 }}
+            transition={{ duration: 1.4, delay: 0.4 }}
+            className="font-script text-2xl md:text-3xl text-gold/90 max-w-2xl mx-auto leading-relaxed"
+          >
+            "Every second spent together is a gift that shines brighter with time."
+          </motion.p>
+        </section>
 
         {/* Memory Gallery Section ("Memories") */}
         <motion.section
           ref={memoriesRef}
           id="memories"
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-120px' }}
+          viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
           className="mb-32 px-margin-mobile md:px-margin-desktop overflow-hidden relative scroll-mt-28"
         >
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute left-1/2 top-0 w-[420px] h-[420px] -translate-x-1/2 bg-[radial-gradient(circle,rgba(239,192,86,0.12),transparent_60%)] blur-3xl opacity-80" />
-            <div className="absolute right-12 top-24 w-24 h-24 rounded-full bg-white/10 blur-2xl opacity-70" />
-            <div className="absolute left-12 top-28 w-16 h-16 rounded-full bg-[#f7e1a2]/20 blur-2xl opacity-80" />
-          </div>
-          <div className="relative select-none text-center">
-            <p className="font-script text-3xl md:text-4xl text-secondary opacity-90 mb-3 tracking-[0.05em]">Our Beautiful</p>
-            <h2 className="font-display-lg text-5xl md:text-6xl text-center mb-4 tracking-[0.12em] text-shimmer leading-tight">
+          <div className="relative select-none text-center mb-12">
+            <p className="font-script text-3xl text-gold/80 mb-2">Our Story in Pictures</p>
+            <h2 className="font-serif text-4xl md:text-5xl text-center mb-3 text-parchment text-shimmer font-semibold">
               Treasured Moments
             </h2>
-            <p className="font-display-lg italic text-lg md:text-xl text-on-surface-variant/80 max-w-2xl mx-auto mb-16 tracking-[0.18em] leading-relaxed">
-              Every memory is a page in our story.
-            </p>
+            <div className="w-12 h-0.5 bg-gold/30 mx-auto rounded-full" />
           </div>
           
-          <div className="flex gap-8 overflow-x-auto pb-12 pt-4 px-6 no-scrollbar snap-x snap-mandatory">
+          <div className="flex gap-8 overflow-x-auto pb-10 pt-2 px-4 no-scrollbar snap-x snap-mandatory">
             <MemoryCard
               image={beachImg}
               alt="Sunset beach memory photo"
@@ -236,23 +260,24 @@ const OurStory = ({ onReplay }) => {
         <motion.section
           ref={wishesRef}
           id="wishes"
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-120px' }}
+          viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-          className="min-h-[70vh] flex flex-col items-center justify-center px-margin-mobile md:px-margin-desktop py-16 relative overflow-hidden scroll-mt-28"
+          className="min-h-[65vh] flex flex-col items-center justify-center px-margin-mobile md:px-margin-desktop py-12 relative overflow-hidden scroll-mt-28"
         >
-          <div className="select-none text-center z-10">
-            <h2 className="font-display-lg text-5xl md:text-6xl text-center mb-4 tracking-widest text-shimmer leading-tight">
+          <div className="select-none text-center z-10 mb-8">
+            <p className="font-script text-3xl text-gold/80 mb-2">Floating Wishes</p>
+            <h2 className="font-serif text-4xl md:text-5xl text-center mb-3 text-parchment text-shimmer font-semibold">
               Wishes in the Sky
             </h2>
-            <p className="font-display-lg italic text-lg md:text-xl text-on-surface-variant/80 max-w-2xl mx-auto mb-16 tracking-wider">
-              Tap a floating glass balloon to release its golden message.
+            <p className="font-sans text-xs md:text-sm text-parchment/70 max-w-xl mx-auto tracking-widest uppercase">
+              Tap a floating balloon to release its golden message
             </p>
           </div>
 
-          <div className="relative w-full max-w-4xl h-[420px] mx-auto z-10">
-            {/* Float Balloons */}
+          <div className="relative w-full max-w-5xl h-[440px] mx-auto z-10">
+            {/* Multi-layered Satin Floating Balloons */}
             <AnimatePresence>
               {balloons.map((balloon) => (
                 <Balloon
@@ -262,27 +287,29 @@ const OurStory = ({ onReplay }) => {
                   delay={balloon.delay}
                   duration={balloon.duration}
                   wish={balloon.text}
+                  color={balloon.color}
+                  depth={balloon.depth}
                   onPop={handleBalloonPop}
                 />
               ))}
             </AnimatePresence>
 
-            {/* Revealed Wishes Cards */}
+            {/* Revealed Wishes Floating Cards */}
             <AnimatePresence>
               {poppedWishes.map((wish) => (
                 <motion.div
                   key={wish.id}
-                  initial={{ opacity: 0, scale: 0.8, y: 25, filter: 'blur(4px)' }}
-                  animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, scale: 0.8, y: -20, filter: 'blur(4px)' }}
+                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, y: -20 }}
                   transition={{ type: 'spring', stiffness: 260, damping: 22 }}
                   style={{ left: `${wish.x}px`, top: `${wish.y}px` }}
-                  className="absolute w-56 p-5 rounded-2xl border border-secondary/35 bg-surface-container-high/45 backdrop-blur-xl shadow-2xl text-center z-25 -translate-x-1/2 -translate-y-1/2 select-none"
+                  className="absolute w-60 p-5 rounded-2xl border border-gold/35 bg-wine-dark/90 backdrop-blur-2xl shadow-2xl text-center z-30 -translate-x-1/2 -translate-y-1/2 select-none"
                 >
                   <div className="flex justify-center mb-2">
-                    <SparkleIcon className="w-5 h-5 animate-pulse text-secondary" />
+                    <SparkleIcon className="w-4 h-4 animate-pulse text-gold" />
                   </div>
-                  <p className="font-display-lg italic text-body-md text-on-surface leading-relaxed">
+                  <p className="font-serif italic text-base text-parchment leading-relaxed">
                     "{wish.text}"
                   </p>
                 </motion.div>
@@ -291,102 +318,126 @@ const OurStory = ({ onReplay }) => {
           </div>
         </motion.section>
 
-        {/* Grand Finale Section ("Grand Finale") */}
+        {/* Grand Finale Letter Experience Section */}
         <motion.section
           ref={finaleRef}
           id="finale"
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-120px' }}
+          viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
           className="min-h-screen flex flex-col items-center justify-center px-margin-mobile md:px-margin-desktop py-16 relative scroll-mt-28"
         >
-          {/* Envelope Card Container */}
+          {/* Section Header */}
+          <div className="text-center mb-10 select-none z-10">
+            <p className="font-script text-3xl text-gold/80 mb-2">The Centerpiece</p>
+            <h2 className="font-serif text-4xl md:text-5xl text-parchment text-shimmer font-semibold">
+              A Personal Letter
+            </h2>
+          </div>
+
+          {/* Envelope Physical Opening Interaction */}
           {!isLetterOpened && (
-            <ParallaxTilt maxRotation={10} scale={1.03} className="w-full max-w-xl">
+            <ParallaxTilt maxRotation={8} scale={1.02} className="w-full max-w-lg">
               <motion.div
-                initial={{ y: 200, opacity: 0, scale: 0.95 }}
-                animate={{ y: 0, opacity: 1, scale: 1 }}
-                transition={{ type: 'spring', damping: 24, stiffness: 85 }}
-                onClick={handleOpenLetter}
+                initial={{ y: 80, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 90 }}
+                onClick={handleOpenLetterSequence}
                 onMouseEnter={playTick}
-                className="w-full glass-panel glass-panel-glow p-10 rounded-2xl relative z-20 cursor-pointer flex flex-col items-center shadow-[0_30px_60px_rgba(0,0,0,0.6)]"
+                className="w-full relative z-20 cursor-pointer flex flex-col items-center group select-none"
               >
-                {/* Envelope Heart Seal */}
-                <motion.div 
-                  whileHover={{ scale: 1.15 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-[#b22222] rounded-full flex items-center justify-center shadow-[0_0_25px_rgba(178,34,34,0.6)] border-2 border-secondary/50 select-none z-30"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-secondary">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                </motion.div>
-                
-                <div className="text-center mt-6 mb-8 select-none">
-                  <p className="font-script text-4xl text-secondary tracking-[0.06em] leading-tight mb-3 opacity-90">
-                    To my dearest,
-                  </p>
-                  <h3 className="font-display-lg text-headline-md md:text-3xl text-on-surface tracking-[0.06em] leading-tight">
-                    A Final Note
-                  </h3>
+                {/* 3D Physical Envelope Structure */}
+                <div className="w-full aspect-[1.6/1] bg-gradient-to-b from-[#24151B] to-[#180E12] rounded-2xl border border-gold/30 shadow-[0_30px_70px_rgba(0,0,0,0.7)] relative overflow-hidden flex flex-col items-center justify-center p-8">
+                  {/* Outer Gold Debossed Border */}
+                  <div className="absolute inset-3 border border-gold/20 rounded-xl pointer-events-none" />
+
+                  {/* Envelope Flap 3D Simulation */}
+                  <motion.div 
+                    animate={isEnvelopeClicked ? { rotateX: -160, y: -40, opacity: 0.4 } : { rotateX: 0, y: 0 }}
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ transformOrigin: 'top center' }}
+                    className="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-[#2E1B23] to-[#24151B] border-b border-gold/20 rounded-t-2xl shadow-md z-20 pointer-events-none"
+                  />
+
+                  {/* Crimson Wax Seal with Heart */}
+                  <motion.div 
+                    whileHover={{ scale: 1.12 }}
+                    whileTap={{ scale: 0.95 }}
+                    animate={isEnvelopeClicked ? { scale: 0, opacity: 0 } : { scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="w-16 h-16 rounded-full wax-seal flex items-center justify-center z-30 shadow-xl"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 text-gold">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                    </svg>
+                  </motion.div>
+
+                  <div className="mt-8 text-center z-10">
+                    <p className="font-script text-3xl text-gold/90 mb-1">To My Dearest,</p>
+                    <p className="font-sans text-xs text-parchment/70 tracking-[0.2em] uppercase">Tap to unfold this letter</p>
+                  </div>
                 </div>
-                
-                <button
-                  onClick={handleOpenLetter}
-                  className="px-10 py-3 bg-secondary/10 border border-secondary text-secondary rounded-full font-label-md text-label-md hover:bg-secondary hover:text-on-secondary transition-all duration-300 ambient-glow-gold select-none btn-sheen cursor-pointer"
-                >
-                  Open Letter
-                </button>
               </motion.div>
             </ParallaxTilt>
           )}
 
-          {/* Letter Reveal Content */}
+          {/* Physical Luxury Stationery Letter Composition */}
           {isLetterOpened && (
-            <div className="relative w-full max-w-2xl mt-8 z-20 flex items-center justify-center">
-              {/* Pulsing Warm backlight glow behind paper */}
-              <div className="absolute inset-[-15%] bg-[radial-gradient(circle,rgba(239,192,86,0.18)_0%,transparent_75%)] rounded-full blur-3xl opacity-80 animate-pulse pointer-events-none z-0" />
+            <div className="relative w-full max-w-2xl z-20 flex flex-col items-center justify-center">
+              {/* Soft warm gold backlight glow behind parchment */}
+              <div className="absolute inset-[-12%] bg-[radial-gradient(circle,rgba(201,169,138,0.18)_0%,transparent_70%)] rounded-full blur-3xl opacity-80 animate-pulse pointer-events-none z-0" />
 
               <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 50, filter: 'blur(6px)' }}
-                animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+                initial={{ opacity: 0, scale: 0.94, y: 40 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full p-10 md:p-14 rounded-2xl border border-white/10 shadow-[0_30px_70px_rgba(0,0,0,0.7)] z-10 relative overflow-hidden"
-                style={{
-                  background: 'linear-gradient(rgba(12,15,16,0.92) 0%, rgba(12,15,16,0.98) 100%), repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(239, 192, 86, 0.03) 31px, rgba(239, 192, 86, 0.03) 32px)',
-                  boxShadow: '0 20px 50px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.05)'
-                }}
+                className="w-full p-8 sm:p-12 md:p-16 rounded-2xl stationery-paper z-10 relative overflow-hidden"
               >
-                {/* Thin inner gold frame outline */}
-                <div className="absolute inset-4 rounded-xl border border-secondary/15 pointer-events-none" />
+                {/* Gold Blind-Debossed Inner Border Frame */}
+                <div className="absolute inset-5 rounded-xl paper-inner-border pointer-events-none" />
 
-                <p className="font-display-lg text-lg md:text-xl text-on-background leading-loose typewriter pr-1 whitespace-pre-wrap select-none tracking-wide">
+                {/* Top Ornamental Filigree Divider */}
+                <div className="text-center mb-8 text-gold/60 select-none">
+                  <span className="font-serif text-xl tracking-[0.3em]">❖ ❖ ❖</span>
+                </div>
+
+                {/* Main Personal Message Text */}
+                <div className="font-serif text-xl sm:text-2xl text-[#2D2024] leading-[1.85] typewriter whitespace-pre-wrap select-none tracking-wide">
                   {typewrittenText}
-                  {isTyping && <span className="inline-block w-1.5 h-5 bg-secondary animate-pulse ml-0.5" />}
-                </p>
+                  {isTyping && <span className="inline-block w-1.5 h-6 bg-[#5A2936] animate-pulse ml-1" />}
+                </div>
 
-                {/* Heart and Sparkles Finale */}
+                {/* Handwritten Signature */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: typewrittenText.length > 50 ? 1 : 0, y: 0 }}
+                  transition={{ duration: 1.5 }}
+                  className="mt-8 text-right font-script text-3xl sm:text-4xl text-[#5A2936] select-none pr-4"
+                >
+                  With all my love.
+                </motion.div>
+
+                {/* Heart & Celebration Finale */}
                 <AnimatePresence>
                   {showHeartFinale && (
                     <motion.div
-                      initial={{ opacity: 0, scale: 0.8, filter: 'blur(4px)' }}
-                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 1.6 }}
-                      className="mt-14 text-center select-none"
+                      className="mt-12 pt-8 border-t border-gold/20 text-center select-none"
                     >
-                      {/* Big Gold Heart */}
-                      <div className="flex justify-center mb-6">
+                      <div className="flex justify-center mb-4">
                         <svg 
                           xmlns="http://www.w3.org/2000/svg" 
                           viewBox="0 0 24 24" 
                           fill="currentColor" 
-                          className="w-16 h-16 text-[#b22222] drop-shadow-[0_0_30px_rgba(255,107,170,0.85)] animate-pulse"
+                          className="w-12 h-12 text-[#5A2936] drop-shadow-[0_0_20px_rgba(142,90,99,0.6)] animate-pulse"
                         >
                           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                         </svg>
                       </div>
-                      <h2 className="font-display-lg text-display-lg-mobile md:text-display-lg text-shimmer leading-tight tracking-[0.05em]">
+                      <h2 className="font-serif text-3xl sm:text-4xl text-[#5A2936] font-semibold tracking-wide">
                         Happy Birthday ❤️
                       </h2>
                     </motion.div>
@@ -397,14 +448,14 @@ const OurStory = ({ onReplay }) => {
           )}
 
           {/* Replay Button */}
-          <div className="mt-20 z-20">
+          <div className="mt-16 z-20">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleReplayJourney}
-              className="flex items-center gap-3.5 px-8 py-4.5 border-[1.5px] border-secondary text-secondary bg-secondary/5 font-label-md text-label-md rounded-full hover:bg-secondary/10 hover:shadow-[0_0_30px_rgba(239,192,86,0.3)] transition-all duration-300 select-none btn-sheen cursor-pointer"
+              className="flex items-center gap-3 px-8 py-4 border border-gold/30 text-gold bg-gold/5 font-sans text-xs uppercase tracking-[0.18em] rounded-full hover:bg-gold hover:text-midnight hover:shadow-[0_0_30px_rgba(201,169,138,0.3)] transition-all duration-300 select-none btn-sheen cursor-pointer"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                 <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-.73" />
               </svg>
               Replay the Journey
@@ -414,15 +465,15 @@ const OurStory = ({ onReplay }) => {
       </main>
 
       {/* Footer */}
-      <footer className="w-full flex flex-col sm:flex-row justify-between items-center gap-6 px-margin-mobile md:px-margin-desktop py-10 bg-gradient-to-t from-[#0c0f10]/95 to-transparent z-40 relative lg:pr-80 border-t border-white/5 select-none">
-        <div className="text-on-surface-variant/80 font-label-md text-label-md order-2 sm:order-1">
+      <footer className="w-full flex flex-col sm:flex-row justify-between items-center gap-6 px-margin-mobile md:px-margin-desktop py-8 bg-gradient-to-t from-midnight to-transparent z-40 relative lg:pr-72 border-t border-gold/10 select-none">
+        <div className="text-parchment/60 font-sans text-xs tracking-wider order-2 sm:order-1">
           Created with Love • 2026
         </div>
         <div className="flex gap-6 order-3 sm:order-2">
-          <span className="text-on-surface-variant/80 font-label-md text-label-md hover:text-secondary transition-colors cursor-pointer">Privacy</span>
-          <span className="text-on-surface-variant/80 font-label-md text-label-md hover:text-secondary transition-colors cursor-pointer">Terms</span>
+          <span className="text-parchment/60 font-sans text-xs hover:text-gold transition-colors cursor-pointer">Privacy</span>
+          <span className="text-parchment/60 font-sans text-xs hover:text-gold transition-colors cursor-pointer">Terms</span>
         </div>
-        <div className="text-secondary font-bold font-display-lg text-headline-sm tracking-widest order-1 sm:order-3 text-shimmer">
+        <div className="text-gold font-serif text-lg tracking-widest order-1 sm:order-3 text-shimmer font-semibold uppercase">
           priyanshu chakraborty
         </div>
       </footer>
