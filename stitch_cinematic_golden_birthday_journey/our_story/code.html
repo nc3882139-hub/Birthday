@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Celebration - Memory Gallery &amp; Final Wishes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-background": "#e1e3e4",
+                        "on-primary-fixed": "#341010",
+                        "surface-container-high": "#282a2b",
+                        "on-primary-fixed-variant": "#683a38",
+                        "on-primary-container": "#a9726f",
+                        "on-tertiary-fixed-variant": "#8c0550",
+                        "on-tertiary": "#640037",
+                        "on-surface-variant": "#d6c2c1",
+                        "primary": "#f7b7b3",
+                        "tertiary-container": "#35001a",
+                        "surface-dim": "#111415",
+                        "secondary-fixed": "#ffdf9f",
+                        "surface-bright": "#373a3b",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "on-tertiary-container": "#d84c8a",
+                        "secondary-fixed-dim": "#efc056",
+                        "surface-variant": "#323536",
+                        "on-error": "#690005",
+                        "inverse-on-surface": "#2e3132",
+                        "background": "#111415",
+                        "surface": "#111415",
+                        "error": "#ffb4ab",
+                        "on-secondary-fixed": "#261a00",
+                        "surface-container": "#1d2021",
+                        "on-surface": "#e1e3e4",
+                        "primary-fixed-dim": "#f7b7b3",
+                        "primary-fixed": "#ffdad8",
+                        "tertiary-fixed-dim": "#ffb0cb",
+                        "on-secondary-container": "#fffbff",
+                        "primary-container": "#2d0b0b",
+                        "surface-tint": "#f7b7b3",
+                        "tertiary-fixed": "#ffd9e4",
+                        "on-secondary": "#402d00",
+                        "outline-variant": "#514343",
+                        "error-container": "#93000a",
+                        "secondary-container": "#946e00",
+                        "inverse-surface": "#e1e3e4",
+                        "on-error-container": "#ffdad6",
+                        "outline": "#9e8d8b",
+                        "surface-container-lowest": "#0c0f10",
+                        "surface-container-low": "#191c1d",
+                        "inverse-primary": "#83514f",
+                        "tertiary": "#ffb0cb",
+                        "secondary": "#efc056",
+                        "surface-container-highest": "#323536",
+                        "on-primary": "#4d2423",
+                        "on-tertiary-fixed": "#3e0020"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "margin-mobile": "20px",
+                        "stack-sm": "8px",
+                        "margin-desktop": "80px",
+                        "stack-lg": "32px",
+                        "container-max": "1200px",
+                        "stack-xl": "64px",
+                        "gutter": "24px",
+                        "stack-md": "16px"
+                    },
+                    fontFamily: {
+                        "display-lg": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "label-md": ["Inter"],
+                        "headline-sm": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"]
+                    },
+                    fontSize: {
+                        "display-lg": ["64px", { lineHeight: "72px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                        "display-lg-mobile": ["40px", { lineHeight: "48px", letterSpacing: "-0.01em", fontWeight: "700" }],
+                        "label-md": ["14px", { lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "600" }],
+                        "headline-sm": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "headline-md": ["32px", { lineHeight: "40px", fontWeight: "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background: linear-gradient(180deg, #111415 0%, #2d0b0b 100%);
+            color: #e1e3e4;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-panel-glow {
+            border: 1px solid rgba(239, 192, 86, 0.4);
+            box-shadow: 0 0 20px rgba(239, 192, 86, 0.2);
+        }
+
+        /* Ambient Glow */
+        .ambient-glow-gold {
+            box-shadow: 0 0 30px rgba(239, 192, 86, 0.15);
+        }
+        
+        .ambient-glow-gold:hover {
+            box-shadow: 0 0 40px rgba(239, 192, 86, 0.3);
+        }
+
+        /* Hide scrollbar for horizontal scroll */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+            animation: float 6s ease-in-out 3s infinite;
+        }
+
+        /* Shimmer text */
+        .text-shimmer {
+            background: linear-gradient(90deg, #efc056 0%, #fff 50%, #efc056 100%);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+        @keyframes shimmer {
+            to { background-position: 200% center; }
+        }
+
+        /* Typewriter */
+        .typewriter {
+            overflow: hidden;
+            white-space: pre-wrap;
+            margin: 0 auto;
+            letter-spacing: .1em;
+        }
+
+        /* Pop Animation */
+        @keyframes pop {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+        .popped {
+            animation: pop 0.3s ease-out forwards;
+        }
+
+        /* Envelope Animation */
+        @keyframes dropIn {
+            0% { transform: translateY(-100vh) rotate(-10deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        .envelope-drop {
+            animation: dropIn 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen font-body-md text-on-background relative">
+<!-- Background Shader -->
+<div class="fixed inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen">
+<!-- STITCH_SHADER_START:ANIMATION_7 class="absolute inset-0 w-full h-full" -->
+<div class="absolute inset-0 w-full h-full" style="display:block;">
+<canvas id="shader-canvas-ANIMATION_7" style="display:block;width:100%;height:100%"></canvas>
+<script>
+(function() {
+  const canvas = document.getElementById('shader-canvas-ANIMATION_7');
+
+  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
+  // This fires on initial layout and whenever the element is resized.
+  function syncSize() {
+    const w = canvas.clientWidth  || 1280;
+    const h = canvas.clientHeight || 720;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width  = w;
+      canvas.height = h;
+    }
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(syncSize).observe(canvas);
+  }
+  syncSize();
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+  const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+  const fs = `precision highp float;
+uniform float u_time;
+uniform vec2 u_resolution;
+
+float noise(vec2 p) {
+    return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+void main() {
+    vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+    
+    // Deep burgundy background
+    vec3 color = mix(vec3(0.05, 0.0, 0.0), vec3(0.15, 0.02, 0.02), uv.y);
+    
+    // Floating particles (stars/sparkles)
+    for(float i = 0.0; i < 50.0; i++) {
+        vec2 pos = vec2(noise(vec2(i, 1.0)), noise(vec2(i, 2.0)));
+        pos.y = fract(pos.y - u_time * 0.05 * noise(vec2(i, 3.0)));
+        float dist = length(uv - pos);
+        float size = 0.002 * noise(vec2(i, 4.0));
+        float sparkle = smoothstep(size, 0.0, dist);
+        color += sparkle * vec3(1.0, 0.8, 0.4) * (0.5 + 0.5 * sin(u_time * 2.0 + i));
+    }
+    
+    gl_FragColor = vec4(color, 1.0);
+}`;
+  function cs(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const pos = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uRes = gl.getUniformLocation(prog, 'u_resolution');
+  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
+  // Shaders that need normalized coords should use: u_mouse / u_resolution.
+  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+  window.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const nx = (event.clientX - rect.left) / rect.width;
+      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+      mouse.x = nx * canvas.width;
+      mouse.y = ny * canvas.height;
+    }
+  });
+
+  function render(t) {
+    if (typeof ResizeObserver === 'undefined') syncSize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    if (uTime) gl.uniform1f(uTime, t * 0.001);
+    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  render(0);
+})();
+</script>
+</div>
+<!-- STITCH_SHADER_END:ANIMATION_7 -->
+</div>
+<!-- Top Navigation (Shell) -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-stack-md bg-gradient-to-b from-surface-dim/80 to-transparent">
+<div class="font-display-lg text-headline-md md:text-headline-md text-secondary drop-shadow-[0_0_10px_rgba(246,198,91,0.5)]">
+            The Celebration
+        </div>
+<div class="hidden md:flex gap-8">
+<span class="text-on-surface-variant font-label-md text-label-md hover:text-secondary hover:drop-shadow-[0_0_8px_rgba(246,198,91,0.8)] transition-all duration-500 cursor-pointer">The Beginning</span>
+<span class="text-on-surface-variant font-label-md text-label-md hover:text-secondary hover:drop-shadow-[0_0_8px_rgba(246,198,91,0.8)] transition-all duration-500 cursor-pointer">Growing Up</span>
+<span class="text-on-surface-variant font-label-md text-label-md hover:text-secondary hover:drop-shadow-[0_0_8px_rgba(246,198,91,0.8)] transition-all duration-500 cursor-pointer">Memories</span>
+<span class="text-secondary font-bold font-label-md text-label-md hover:text-secondary hover:drop-shadow-[0_0_8px_rgba(246,198,91,0.8)] transition-all duration-500 cursor-pointer scale-95">Wishes</span>
+<span class="text-on-surface-variant font-label-md text-label-md hover:text-secondary hover:drop-shadow-[0_0_8px_rgba(246,198,91,0.8)] transition-all duration-500 cursor-pointer">The Grand Finale</span>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-secondary hover:text-secondary hover:drop-shadow-[0_0_8px_rgba(246,198,91,0.8)] transition-all duration-500 cursor-pointer" data-icon="volume_up">volume_up</span>
+<span class="material-symbols-outlined text-secondary hover:text-secondary hover:drop-shadow-[0_0_8px_rgba(246,198,91,0.8)] transition-all duration-500 cursor-pointer md:hidden" data-icon="menu">menu</span>
+</div>
+</nav>
+<!-- Side Navigation (Web) -->
+<aside class="hidden md:flex fixed right-0 top-0 h-full z-[100] flex-col p-stack-lg bg-surface-container/10 backdrop-blur-xl w-80 border-l border-on-surface-variant/15 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+<div class="mb-stack-lg">
+<h2 class="font-headline-sm text-headline-sm text-secondary">Story Chapters</h2>
+<p class="font-label-md text-label-md text-on-surface-variant mt-2">Relive the magic</p>
+</div>
+<div class="flex flex-col gap-4 flex-grow">
+<div class="flex items-center gap-4 p-3 text-on-surface-variant hover:bg-on-surface-variant/5 transition-colors cursor-pointer rounded-lg">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-md text-label-md">The Beginning</span>
+</div>
+<div class="flex items-center gap-4 p-3 text-on-surface-variant hover:bg-on-surface-variant/5 transition-colors cursor-pointer rounded-lg">
+<span class="material-symbols-outlined" data-icon="child_care">child_care</span>
+<span class="font-label-md text-label-md">Growing Up</span>
+</div>
+<div class="flex items-center gap-4 p-3 text-on-surface-variant hover:bg-on-surface-variant/5 transition-colors cursor-pointer rounded-lg">
+<span class="material-symbols-outlined" data-icon="photo_library">photo_library</span>
+<span class="font-label-md text-label-md">Memories</span>
+</div>
+<div class="flex items-center gap-4 p-3 text-secondary border-r-2 border-secondary pr-4 translate-x-1 duration-300 bg-on-surface-variant/5 cursor-pointer rounded-lg">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+<span class="font-label-md text-label-md">Wishes</span>
+</div>
+<div class="flex items-center gap-4 p-3 text-on-surface-variant hover:bg-on-surface-variant/5 transition-colors cursor-pointer rounded-lg">
+<span class="material-symbols-outlined" data-icon="celebration">celebration</span>
+<span class="font-label-md text-label-md">The Grand Finale</span>
+</div>
+</div>
+<button class="w-full py-3 border-[1.5px] border-secondary text-secondary font-label-md text-label-md rounded-full hover:bg-secondary/10 hover:shadow-[0_0_30px_rgba(239,192,86,0.15)] transition-all">Go to Today</button>
+</aside>
+<!-- Main Content -->
+<main class="relative z-10 pt-[120px] pb-stack-xl md:pr-80">
+<!-- Memory Gallery Section -->
+<section class="mb-stack-xl px-margin-mobile md:px-margin-desktop overflow-hidden">
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-center mb-stack-lg text-shimmer">Treasured Moments</h2>
+<div class="flex gap-8 overflow-x-auto pb-8 pt-4 px-4 no-scrollbar snap-x snap-mandatory">
+<!-- Memory Card 1 -->
+<div class="min-w-[300px] md:min-w-[400px] h-[400px] md:h-[500px] glass-panel rounded-xl overflow-hidden snap-center group hover:scale-105 transition-transform duration-500 animate-float relative cursor-pointer flex-shrink-0">
+<img alt="A beautiful romantic memory photo: Sunset beach with golden hour lighting, two people silhouettes holding hands, soft bokeh, cinematic film aesthetic." class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 mix-blend-luminosity group-hover:mix-blend-normal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKcIl5r7xuFtQ_bHh6cdQ3VgY8NoFgj3EpyTgSlrqMRHRx1xIqxavo1UG7LZxQk2ZjLIpijPiUeLoK-sWx0d3-TvpnKiUSQoSj5mhwKP0mxQxMbPqhUJ3SSKsbWDXXBhPg5V8VN_lW8s9SxbZ82E_dym50bYc167fXiwJePRdjVxhINCz50QIvSlSfp-PqWjrKQ49FgyObLi4MtAe2DWlGo3G1KVWlKoQ0frCowB6mUMhQqlR1U3yRBN8HJFwI3DF9xOwgsOmymvDt"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+<h3 class="font-headline-sm text-headline-sm text-secondary mb-2">A Walk to Remember</h3>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">The day the world stood still, wrapped in golden light.</p>
+</div>
+</div>
+<!-- Memory Card 2 -->
+<div class="min-w-[300px] md:min-w-[400px] h-[400px] md:h-[500px] glass-panel rounded-xl overflow-hidden snap-center group hover:scale-105 transition-transform duration-500 animate-float-delayed relative cursor-pointer flex-shrink-0 mt-8">
+<img alt="A beautiful romantic memory photo: Cozy cafe with fairy lights, warm candlelight, a cup of coffee and a rose on a table, soft dreamy lighting." class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 mix-blend-luminosity group-hover:mix-blend-normal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6gVmXGFCHlLPa1jlLKLyRABAu3H3KrdoWMOrf7GQZQC_RPzRqr_vhjzyvryAkV3S47qanla9F9Ti2c4jQjN2-rMDLEYeQe1CET29FgOa8S_qqccyORklK1C-u1hSqVOWFuDT2GsPrpX3wBezVJ2MuQwx8MSvYDdnSUcMht-CyCWPksvDV7-gVGWXBdV5ACkme-t-bb4o_pHal6tzOqXSZH6SwXfyOzsC49nOvjMF2cdRwaEWrAvgHc77I_GdQveQUkggLjIWHERMs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+<h3 class="font-headline-sm text-headline-sm text-secondary mb-2">Quiet Evenings</h3>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">Coffee, candlelight, and a connection that transcends words.</p>
+</div>
+</div>
+<!-- Placeholder Card 3 -->
+<div class="min-w-[300px] md:min-w-[400px] h-[400px] md:h-[500px] glass-panel rounded-xl overflow-hidden snap-center group hover:scale-105 transition-transform duration-500 animate-float relative cursor-pointer flex-shrink-0 bg-surface-container flex items-center justify-center">
+<div class="text-center p-6">
+<span class="material-symbols-outlined text-6xl text-on-surface-variant mb-4" data-icon="photo_camera">photo_camera</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">More Memories Await</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">The journey continues...</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Final Wishes Section (Balloons) -->
+<section class="min-h-[60vh] flex flex-col items-center justify-center px-margin-mobile md:px-margin-desktop py-stack-xl relative overflow-hidden">
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-center mb-stack-lg z-10">Wishes in the Sky</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant text-center mb-12 z-10 max-w-2xl mx-auto">Tap a balloon to reveal a special wish.</p>
+<div class="relative w-full max-w-4xl h-[400px] mx-auto z-10" id="balloon-container">
+<!-- Balloons will be injected here via JS for interaction -->
+</div>
+</section>
+<!-- The Grand Finale (Letter Reveal) -->
+<section class="min-h-screen flex flex-col items-center justify-center px-margin-mobile md:px-margin-desktop py-stack-xl relative" id="finale-section">
+<div class="glass-panel glass-panel-glow w-full max-w-2xl p-8 rounded-xl relative opacity-0 transform translate-y-[-100vh] z-20 cursor-pointer" id="envelope">
+<div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-error rounded-full flex items-center justify-center shadow-lg border-2 border-secondary/50">
+<span class="material-symbols-outlined text-on-error font-bold" data-icon="favorite">favorite</span>
+</div>
+<div class="text-center mt-8 mb-4">
+<p class="font-label-md text-label-md text-secondary tracking-widest uppercase mb-2">To my dearest,</p>
+<h3 class="font-headline-md text-headline-md text-on-surface">A Final Note</h3>
+</div>
+<div class="text-center">
+<button class="px-8 py-3 bg-secondary/10 border border-secondary text-secondary rounded-full font-label-md text-label-md hover:bg-secondary hover:text-on-secondary transition-colors ambient-glow-gold" id="open-letter-btn">Open Letter</button>
+</div>
+</div>
+<div class="glass-panel w-full max-w-3xl p-8 md:p-12 rounded-xl mt-8 hidden z-20 relative" id="letter-content">
+<p class="font-body-lg text-body-lg md:text-xl text-on-background leading-relaxed typewriter border-r-2 border-secondary pr-1" id="typewriter-text"></p>
+<div class="mt-12 text-center opacity-0 transition-opacity duration-1000" id="heart-finale">
+<span class="material-symbols-outlined text-6xl text-error drop-shadow-[0_0_30px_rgba(255,107,170,0.8)] animate-pulse" data-icon="favorite" data-weight="fill" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-shimmer mt-6">Happy Birthday ❤️</h2>
+</div>
+</div>
+<div class="mt-16 z-20">
+<button class="flex items-center gap-2 px-8 py-4 border-[1.5px] border-secondary text-secondary font-label-md text-label-md rounded-full hover:bg-secondary/10 ambient-glow-gold transition-all">
+<span class="material-symbols-outlined" data-icon="replay">replay</span>
+                    Replay the Journey
+                </button>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full flex justify-between items-center px-margin-mobile md:px-margin-desktop py-stack-md bg-gradient-to-t from-surface-dim/80 to-transparent z-40 relative md:pr-80">
+<div class="text-on-surface-variant font-label-md text-label-md">Created with Love • 2024</div>
+<div class="flex gap-4">
+<span class="text-on-surface-variant font-label-md text-label-md hover:text-secondary transition-colors cursor-pointer">Privacy</span>
+<span class="text-on-surface-variant font-label-md text-label-md hover:text-secondary transition-colors cursor-pointer">Terms</span>
+</div>
+<div class="text-secondary font-bold">Brand Logo</div>
+</footer>
+<script>
+        // Balloon Interaction Logic
+        const balloonContainer = document.getElementById('balloon-container');
+        const wishes = [
+            "May all your dreams take flight this year.",
+            "Wishing you a year filled with endless laughter.",
+            "To a beautiful soul, happy birthday.",
+            "May love surround you always."
+        ];
+
+        wishes.forEach((wish, index) => {
+            const balloon = document.createElement('div');
+            // Random positioning and animation delay
+            const left = 10 + Math.random() * 80; // 10% to 90%
+            const delay = Math.random() * 2;
+            const duration = 4 + Math.random() * 3;
+
+            balloon.className = `absolute bottom-0 w-24 h-32 rounded-t-[50%] rounded-b-[40%] bg-primary/20 backdrop-blur-md border border-primary/40 shadow-[0_0_20px_rgba(247,183,179,0.3)] cursor-pointer flex items-center justify-center group`;
+            balloon.style.left = `${left}%`;
+            balloon.style.animation = `float ${duration}s ease-in-out ${delay}s infinite`;
+            
+            // Balloon string
+            const string = document.createElement('div');
+            string.className = "absolute top-full left-1/2 w-[1px] h-20 bg-primary/50 -translate-x-1/2";
+            balloon.appendChild(string);
+
+            const contentContainer = document.createElement('div');
+            contentContainer.className = "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 bg-surface-container p-4 rounded-lg shadow-xl opacity-0 scale-50 transition-all duration-300 pointer-events-none z-30 text-center border border-secondary/30";
+            contentContainer.innerHTML = `<p class="font-body-md text-on-surface-variant">${wish}</p>`;
+            
+            balloon.addEventListener('click', function() {
+                this.classList.add('popped');
+                contentContainer.classList.remove('opacity-0', 'scale-50');
+                contentContainer.classList.add('opacity-100', 'scale-100');
+                balloonContainer.appendChild(contentContainer); // Move to container so it doesn't pop with balloon
+                
+                // Position wish where balloon was
+                const rect = this.getBoundingClientRect();
+                const containerRect = balloonContainer.getBoundingClientRect();
+                contentContainer.style.left = `${rect.left - containerRect.left + rect.width/2}px`;
+                contentContainer.style.top = `${rect.top - containerRect.top}px`;
+                
+                setTimeout(() => {
+                    this.remove();
+                }, 300);
+            });
+
+            balloonContainer.appendChild(balloon);
+        });
+
+        // Envelope and Typewriter Logic
+        const finaleSection = document.getElementById('finale-section');
+        const envelope = document.getElementById('envelope');
+        const openBtn = document.getElementById('open-letter-btn');
+        const letterContent = document.getElementById('letter-content');
+        const typewriterText = document.getElementById('typewriter-text');
+        const heartFinale = document.getElementById('heart-finale');
+
+        const letterText = "Every moment spent together has been a chapter in a beautiful story. As we celebrate you today, know that my greatest wish is for your happiness to shine as brightly as you do. Thank you for being you.\n\nWith all my love.";
+
+        // Trigger envelope drop when scrolled into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    envelope.classList.add('envelope-drop');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        observer.observe(finaleSection);
+
+        openBtn.addEventListener('click', () => {
+            envelope.style.display = 'none';
+            letterContent.classList.remove('hidden');
+            
+            let i = 0;
+            typewriterText.innerHTML = "";
+            const speed = 50; // ms per char
+
+            function typeWriter() {
+                if (i < letterText.length) {
+                    if (letterText.charAt(i) === '\n') {
+                        typewriterText.innerHTML += '<br>';
+                    } else {
+                        typewriterText.innerHTML += letterText.charAt(i);
+                    }
+                    i++;
+                    setTimeout(typeWriter, speed);
+                } else {
+                    typewriterText.classList.remove('border-r-2'); // remove cursor
+                    setTimeout(() => {
+                        heartFinale.classList.remove('opacity-0');
+                    }, 500);
+                }
+            }
+            
+            // Start typing after a short delay
+            setTimeout(typeWriter, 500);
+        });
+
+    </script>
+</body></html>

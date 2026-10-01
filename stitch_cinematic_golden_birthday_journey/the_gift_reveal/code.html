@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Celebration - A Special Surprise</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#e1e3e4",
+                        "on-primary-fixed": "#341010",
+                        "surface-container-high": "#282a2b",
+                        "on-primary-fixed-variant": "#683a38",
+                        "on-primary-container": "#a9726f",
+                        "on-tertiary-fixed-variant": "#8c0550",
+                        "on-tertiary": "#640037",
+                        "on-surface-variant": "#d6c2c1",
+                        "primary": "#f7b7b3",
+                        "tertiary-container": "#35001a",
+                        "surface-dim": "#111415",
+                        "secondary-fixed": "#ffdf9f",
+                        "surface-bright": "#373a3b",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "on-tertiary-container": "#d84c8a",
+                        "secondary-fixed-dim": "#efc056",
+                        "surface-variant": "#323536",
+                        "on-error": "#690005",
+                        "inverse-on-surface": "#2e3132",
+                        "background": "#111415",
+                        "surface": "#111415",
+                        "error": "#ffb4ab",
+                        "on-secondary-fixed": "#261a00",
+                        "surface-container": "#1d2021",
+                        "on-surface": "#e1e3e4",
+                        "primary-fixed-dim": "#f7b7b3",
+                        "primary-fixed": "#ffdad8",
+                        "tertiary-fixed-dim": "#ffb0cb",
+                        "on-secondary-container": "#fffbff",
+                        "primary-container": "#2d0b0b",
+                        "surface-tint": "#f7b7b3",
+                        "tertiary-fixed": "#ffd9e4",
+                        "on-secondary": "#402d00",
+                        "outline-variant": "#514343",
+                        "error-container": "#93000a",
+                        "secondary-container": "#946e00",
+                        "inverse-surface": "#e1e3e4",
+                        "on-error-container": "#ffdad6",
+                        "outline": "#9e8d8b",
+                        "surface-container-lowest": "#0c0f10",
+                        "surface-container-low": "#191c1d",
+                        "inverse-primary": "#83514f",
+                        "tertiary": "#ffb0cb",
+                        "secondary": "#efc056",
+                        "surface-container-highest": "#323536",
+                        "on-primary": "#4d2423",
+                        "on-tertiary-fixed": "#3e0020"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "stack-sm": "8px",
+                        "margin-desktop": "80px",
+                        "stack-lg": "32px",
+                        "container-max": "1200px",
+                        "stack-xl": "64px",
+                        "gutter": "24px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "label-md": ["Inter"],
+                        "headline-sm": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["64px", { "lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-sm": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .fade-in {
+            animation: fadeIn 3s ease-in-out forwards;
+            opacity: 0;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .gift-container {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gift-container.opening {
+            transform: scale(1.1);
+        }
+        
+        .sparkle-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease-out;
+        }
+
+        .gift-container.opening .sparkle-overlay {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen relative overflow-hidden flex flex-col items-center justify-center">
+<!-- WebGL Background -->
+<div class="absolute inset-0 z-0">
+<!-- STITCH_SHADER_START:ANIMATION_7 class="absolute inset-0 w-full h-full" -->
+<div class="absolute inset-0 w-full h-full" style="display:block;">
+<canvas id="shader-canvas-ANIMATION_7" style="display:block;width:100%;height:100%"></canvas>
+<script>
+(function() {
+  const canvas = document.getElementById('shader-canvas-ANIMATION_7');
+
+  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
+  // This fires on initial layout and whenever the element is resized.
+  function syncSize() {
+    const w = canvas.clientWidth  || 1280;
+    const h = canvas.clientHeight || 720;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width  = w;
+      canvas.height = h;
+    }
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(syncSize).observe(canvas);
+  }
+  syncSize();
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+  const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+  const fs = `precision highp float;
+uniform float u_time;
+uniform vec2 u_resolution;
+
+float noise(vec2 p) {
+    return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+void main() {
+    vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+    
+    // Deep burgundy background
+    vec3 color = mix(vec3(0.05, 0.0, 0.0), vec3(0.15, 0.02, 0.02), uv.y);
+    
+    // Floating particles (stars/sparkles)
+    for(float i = 0.0; i < 50.0; i++) {
+        vec2 pos = vec2(noise(vec2(i, 1.0)), noise(vec2(i, 2.0)));
+        pos.y = fract(pos.y - u_time * 0.05 * noise(vec2(i, 3.0)));
+        float dist = length(uv - pos);
+        float size = 0.002 * noise(vec2(i, 4.0));
+        float sparkle = smoothstep(size, 0.0, dist);
+        color += sparkle * vec3(1.0, 0.8, 0.4) * (0.5 + 0.5 * sin(u_time * 2.0 + i));
+    }
+    
+    gl_FragColor = vec4(color, 1.0);
+}`;
+  function cs(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const pos = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uRes = gl.getUniformLocation(prog, 'u_resolution');
+  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
+  // Shaders that need normalized coords should use: u_mouse / u_resolution.
+  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+  window.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const nx = (event.clientX - rect.left) / rect.width;
+      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+      mouse.x = nx * canvas.width;
+      mouse.y = ny * canvas.height;
+    }
+  });
+
+  function render(t) {
+    if (typeof ResizeObserver === 'undefined') syncSize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    if (uTime) gl.uniform1f(uTime, t * 0.001);
+    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  render(0);
+})();
+</script>
+</div>
+<!-- STITCH_SHADER_END:ANIMATION_7 -->
+<div class="absolute inset-0 bg-gradient-to-b from-surface-dim/40 via-surface-dim/20 to-surface-dim/80"></div>
+</div>
+<!-- Main Content Canvas -->
+<main class="relative z-10 flex flex-col items-center justify-center w-full h-full px-margin-mobile md:px-margin-desktop fade-in">
+<!-- Celebration Header -->
+<div class="text-center mb-stack-xl mt-stack-xl md:mt-0">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-secondary drop-shadow-[0_0_15px_rgba(246,198,91,0.6)] mb-stack-sm">
+                A Special Surprise Awaits You ✨
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+                Prepare to step into a journey crafted just for you.
+            </p>
+</div>
+<!-- Gift Box Interactive Element -->
+<div class="relative w-full max-w-lg mb-stack-xl group cursor-pointer" id="giftBoxContainer" onclick="openGift()">
+<!-- Ambient Glow -->
+<div class="absolute inset-0 bg-secondary rounded-full blur-[100px] opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
+<!-- Glassmorphism Container for Image -->
+<div class="relative rounded-2xl overflow-hidden border border-on-surface-variant/20 bg-surface-container/10 backdrop-blur-2xl shadow-[0_0_40px_rgba(0,0,0,0.4)] gift-container z-10 transition-transform duration-500 hover:scale-[1.02]">
+<div class="aspect-[1.79/1] relative">
+<img class="w-full h-full object-cover transition-opacity duration-700" id="giftImage" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2NJK9drsSiwTfKBCtw3UiqDtde8-s2_vxgiKHHxODPyTTjdhqWYCnk6r5mCKmLhZHIFDvYD7RXwJf8DadB_PjN-eaCc_Y_auljwNRLIaScc1bIqql5I0zg3fVkm2gdzqYPI9beqXV8X1MGvJBVMu9fxqYp0u3KLgNRVEd82jFXcjJ9katsEcirnQ2MXDZt_5J2jt00mwopemiGnz9_6k7KzjzkpPp1yhBATnM1_MskOOn0NVOD7YWxX-SncRRipk_RqlW8QehQ14R"/>
+<!-- Sparkle Explosion Overlay (simulated via radial gradient and CSS for now) -->
+<div class="sparkle-overlay absolute inset-0 bg-[radial-gradient(circle,rgba(246,198,91,0.8)_0%,transparent_70%)] mix-blend-screen"></div>
+</div>
+</div>
+<!-- Floating Interaction Cue -->
+<div class="absolute -bottom-6 left-1/2 -translate-x-1/2 flex items-center justify-center w-12 h-12 rounded-full bg-secondary/10 border border-secondary/30 text-secondary animate-bounce pointer-events-none group-hover:bg-secondary/20 transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">touch_app</span>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex flex-col items-center gap-stack-md z-20">
+<button class="px-8 py-4 rounded-full border-[1.5px] border-secondary text-secondary font-label-md text-label-md hover:bg-secondary/10 hover:shadow-[0_0_20px_rgba(246,198,91,0.3)] transition-all duration-300 flex items-center gap-2" onclick="openGift()">
+                Open My Gift
+                <span class="material-symbols-outlined text-lg">redeem</span>
+</button>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors border-b border-transparent hover:border-on-surface pb-1 opacity-70 hover:opacity-100" href="#">
+                Skip to Story
+            </a>
+</div>
+</main>
+<!-- Top AppBar (Suppressed normally per rules for transactional/splash screens, but included for structure if needed, hidden to prioritize canvas) -->
+<header class="hidden bg-transparent text-secondary docked full-width top-0 no-border bg-gradient-to-b from-surface-dim/80 to-transparent flat no shadows flex justify-between items-center w-full px-margin-desktop py-stack-md z-50">
+<div class="font-display-lg text-display-lg text-secondary drop-shadow-[0_0_10px_rgba(246,198,91,0.5)]">The Celebration</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-secondary hover:drop-shadow-[0_0_8px_rgba(246,198,91,0.8)] transition-all duration-500 cursor-pointer">volume_up</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-secondary hover:drop-shadow-[0_0_8px_rgba(246,198,91,0.8)] transition-all duration-500 cursor-pointer">menu</span>
+</div>
+</header>
+<script>
+        function openGift() {
+            const container = document.getElementById('giftBoxContainer');
+            const image = document.getElementById('giftImage');
+            
+            // Trigger animation classes
+            container.classList.add('opening');
+            
+            // Simulate transition to next state (e.g., flash white)
+            setTimeout(() => {
+                document.body.style.transition = 'background-color 1s ease';
+                document.body.style.backgroundColor = '#fff';
+                // In a real app, this would route to the next view
+            }, 1000);
+        }
+    </script>
+</body></html>
