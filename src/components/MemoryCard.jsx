@@ -58,6 +58,7 @@ const MemoryCard = ({
         <img
           src={image}
           alt={alt}
+          loading="lazy"
           className="w-full h-full object-cover transition-all duration-[1200ms] ease-out group-hover:scale-[1.07] filter saturate-[0.78] opacity-85 brightness-90 group-hover:saturate-100 group-hover:opacity-100 group-hover:brightness-100"
           style={{ transform: 'translateZ(-10px)' }}
         />

@@ -1,159 +1,249 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 const AudioContext = createContext(null);
 
+const CHORD_PROGRESSIONS = [
+  { pad: [130.81, 196, 246.94, 293.66], piano: [392, 493.88, 587.33, 493.88] },
+  { pad: [110, 164.81, 196, 246.94], piano: [329.63, 392, 493.88, 392] },
+  { pad: [87.31, 130.81, 164.81, 196], piano: [261.63, 329.63, 392, 329.63] },
+  { pad: [98, 146.83, 174.61, 220], piano: [293.66, 349.23, 440, 349.23] }
+];
+
 export const AudioProvider = ({ children }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(0.38);
+  const [audioError, setAudioError] = useState('');
   const audioCtxRef = useRef(null);
-  const activeOscillators = useRef([]);
+  const musicGainRef = useRef(null);
+  const uiGainRef = useRef(null);
+  const activeVoices = useRef([]);
   const timerId = useRef(null);
-  
-  // Note frequencies matching beautiful warm jazz chord extensions
-  const chords = [
-    [130.81, 164.81, 196.00, 246.94, 293.66], // Cmaj9 (C3, E3, G3, B3, D4)
-    [110.00, 130.81, 164.81, 196.00, 246.94], // Am9 (A2, C3, E3, G3, B3)
-    [87.31, 110.00, 130.81, 164.81, 196.00],  // Fmaj9 (F2, A2, C3, E3, G3)
-    [98.00, 123.47, 146.83, 174.61, 220.00]   // G11/G9 (G2, B2, D3, F3, A3)
-  ];
-  
   const currentChordIndex = useRef(0);
+  const isPlayingRef = useRef(false);
+  const isMutedRef = useRef(false);
+  const volumeRef = useRef(0.38);
+  const startPendingRef = useRef(false);
 
-  const initAudio = () => {
+  const getAudioContext = () => {
     if (!audioCtxRef.current) {
-      audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextConstructor) throw new Error('Web Audio is not supported in this browser.');
+
+      const context = new AudioContextConstructor();
+      const musicGain = context.createGain();
+      const uiGain = context.createGain();
+      musicGain.gain.value = 0;
+      uiGain.gain.value = 0.18;
+      musicGain.connect(context.destination);
+      uiGain.connect(context.destination);
+
+      audioCtxRef.current = context;
+      musicGainRef.current = musicGain;
+      uiGainRef.current = uiGain;
     }
-    if (audioCtxRef.current.state === 'suspended') {
-      audioCtxRef.current.resume();
-    }
+
+    return audioCtxRef.current;
+  };
+
+  const rampMusicGain = (target, seconds) => {
+    const context = audioCtxRef.current;
+    const gain = musicGainRef.current;
+    if (!context || !gain) return;
+
+    const now = context.currentTime;
+    gain.gain.cancelScheduledValues(now);
+    gain.gain.setTargetAtTime(target, now, seconds);
+  };
+
+  const registerVoice = (oscillator, voiceGain, filter) => {
+    activeVoices.current.push({ oscillator, gain: voiceGain });
+    oscillator.onended = () => {
+      activeVoices.current = activeVoices.current.filter((voice) => voice.oscillator !== oscillator);
+      oscillator.disconnect();
+      voiceGain.disconnect();
+      filter.disconnect();
+    };
   };
 
   const playChord = () => {
-    if (!audioCtxRef.current || audioCtxRef.current.state === 'suspended') return;
-    
-    const ctx = audioCtxRef.current;
-    const now = ctx.currentTime;
-    
-    // Cycle chord
-    const chordNotes = chords[currentChordIndex.current];
-    currentChordIndex.current = (currentChordIndex.current + 1) % chords.length;
-    
-    // master gain for this specific chord block
-    const masterGain = ctx.createGain();
-    masterGain.gain.setValueAtTime(0, now);
-    masterGain.gain.linearRampToValueAtTime(0.06, now + 1.8); // slow atmospheric fade-in
-    masterGain.gain.setValueAtTime(0.06, now + 3.0);
-    masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 4.8); // soft decay
-    
-    // lowpass filter to create warm, mellow piano timbre
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(500, now);
-    
-    masterGain.connect(filter);
-    filter.connect(ctx.destination);
-    
-    // play each note of the chord with a light arpeggiation delay
-    let remainingNotes = chordNotes.length;
-    chordNotes.forEach((freq, index) => {
-      const osc = ctx.createOscillator();
-      const oscGain = ctx.createGain();
-      
-      // Mellow triangle wave
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, now + index * 0.08);
-      
-      oscGain.gain.setValueAtTime(0.1, now);
-      oscGain.gain.exponentialRampToValueAtTime(0.03, now + 4.2);
-      
-      osc.connect(oscGain);
-      oscGain.connect(masterGain);
-      osc.onended = () => {
-        activeOscillators.current = activeOscillators.current.filter((activeOscillator) => activeOscillator !== osc);
-        osc.disconnect();
-        oscGain.disconnect();
-        remainingNotes -= 1;
-        if (remainingNotes === 0) {
-          masterGain.disconnect();
-          filter.disconnect();
-        }
-      };
-      
-      osc.start(now + index * 0.08);
-      osc.stop(now + 4.9);
-      
-      activeOscillators.current.push(osc);
+    const context = audioCtxRef.current;
+    if (!context || context.state !== 'running' || !isPlayingRef.current || isMutedRef.current) return;
+
+    const now = context.currentTime;
+    const chord = CHORD_PROGRESSIONS[currentChordIndex.current];
+    currentChordIndex.current = (currentChordIndex.current + 1) % CHORD_PROGRESSIONS.length;
+
+    chord.pad.forEach((frequency, index) => {
+      const oscillator = context.createOscillator();
+      const filter = context.createBiquadFilter();
+      const voiceGain = context.createGain();
+      const end = now + 6.7;
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(frequency, now);
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(780 + index * 75, now);
+      voiceGain.gain.setValueAtTime(0.0001, now);
+      voiceGain.gain.linearRampToValueAtTime(0.018, now + 1.15);
+      voiceGain.gain.setValueAtTime(0.018, now + 4.7);
+      voiceGain.gain.exponentialRampToValueAtTime(0.0001, end);
+
+      oscillator.connect(filter);
+      filter.connect(voiceGain);
+      voiceGain.connect(musicGainRef.current);
+      registerVoice(oscillator, voiceGain, filter);
+      oscillator.start(now);
+      oscillator.stop(end);
+    });
+
+    chord.piano.forEach((frequency, index) => {
+      const oscillator = context.createOscillator();
+      const filter = context.createBiquadFilter();
+      const voiceGain = context.createGain();
+      const start = now + 0.35 + index * 0.82;
+      const end = start + 2.4;
+
+      oscillator.type = 'triangle';
+      oscillator.frequency.setValueAtTime(frequency, start);
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(1850, start);
+      voiceGain.gain.setValueAtTime(0.0001, start);
+      voiceGain.gain.linearRampToValueAtTime(0.045, start + 0.025);
+      voiceGain.gain.exponentialRampToValueAtTime(0.0001, end);
+
+      oscillator.connect(filter);
+      filter.connect(voiceGain);
+      voiceGain.connect(musicGainRef.current);
+      registerVoice(oscillator, voiceGain, filter);
+      oscillator.start(start);
+      oscillator.stop(end);
     });
   };
 
-  const playTick = () => {
-    initAudio();
-    if (!audioCtxRef.current) return;
-    
-    const ctx = audioCtxRef.current;
-    if (ctx.state === 'suspended') return;
-    
-    const now = ctx.currentTime;
-    
-    // Quick organic glass click
-    const osc = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-    const filter = ctx.createBiquadFilter();
-    
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(1200, now);
-    osc.frequency.exponentialRampToValueAtTime(400, now + 0.04);
-    
-    gainNode.gain.setValueAtTime(0.05, now);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
-    
-    filter.type = 'highpass';
-    filter.frequency.setValueAtTime(300, now);
-    
-    osc.connect(gainNode);
-    gainNode.connect(filter);
-    filter.connect(ctx.destination);
-    
-    osc.start(now);
-    osc.stop(now + 0.06);
-  };
+  const startMusic = async () => {
+    if (isPlayingRef.current || startPendingRef.current) return;
+    startPendingRef.current = true;
 
-  const togglePlay = () => {
-    initAudio();
-    
-    if (isPlaying) {
-      if (timerId.current) {
-        clearInterval(timerId.current);
-        timerId.current = null;
-      }
-      activeOscillators.current.forEach((oscillator) => {
-        if (oscillator.state !== 'stopped') oscillator.stop();
-      });
-      activeOscillators.current = [];
-      setIsPlaying(false);
-    } else {
+    try {
+      const context = getAudioContext();
+      if (context.state === 'suspended') await context.resume();
+
+      isPlayingRef.current = true;
       setIsPlaying(true);
+      setAudioError('');
+      rampMusicGain(isMutedRef.current ? 0 : volumeRef.current, 0.65);
       playChord();
-      timerId.current = setInterval(playChord, 5000);
+      timerId.current = window.setInterval(playChord, 6500);
+    } catch (error) {
+      console.error('Unable to start the ambient score.', error);
+      setAudioError('Ambient music is unavailable in this browser.');
+    } finally {
+      startPendingRef.current = false;
     }
   };
 
-  useEffect(() => {
-    return () => {
-      if (timerId.current) {
-        clearInterval(timerId.current);
-      }
-      activeOscillators.current.forEach((oscillator) => {
-        if (oscillator.state !== 'stopped') oscillator.stop();
-      });
-      activeOscillators.current = [];
-      if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
-        audioCtxRef.current.close();
-      }
+  const stopMusic = () => {
+    if (timerId.current) {
+      window.clearInterval(timerId.current);
+      timerId.current = null;
+    }
+
+    isPlayingRef.current = false;
+    setIsPlaying(false);
+    rampMusicGain(0, 0.16);
+
+    const context = audioCtxRef.current;
+    if (!context) return;
+    const stopAt = context.currentTime + 0.45;
+    activeVoices.current.forEach(({ oscillator, gain }) => {
+      if (oscillator.state === 'stopped') return;
+      gain.gain.cancelScheduledValues(context.currentTime);
+      gain.gain.setTargetAtTime(0.0001, context.currentTime, 0.08);
+      oscillator.stop(stopAt);
+    });
+  };
+
+  const togglePlay = () => {
+    if (isPlayingRef.current) {
+      stopMusic();
+    } else {
+      void startMusic();
+    }
+  };
+
+  const toggleMute = () => {
+    const nextMuted = !isMutedRef.current;
+    isMutedRef.current = nextMuted;
+    setIsMuted(nextMuted);
+    rampMusicGain(nextMuted || !isPlayingRef.current ? 0 : volumeRef.current, 0.12);
+  };
+
+  const changeVolume = (nextVolume) => {
+    const next = Math.max(0, Math.min(1, Number(nextVolume)));
+    volumeRef.current = next;
+    setVolume(next);
+    rampMusicGain(isMutedRef.current || !isPlayingRef.current ? 0 : next, 0.12);
+  };
+
+  const playTick = () => {
+    let context;
+    try {
+      context = getAudioContext();
+    } catch (error) {
+      console.error('Unable to play the interface sound.', error);
+      return;
+    }
+
+    if (context.state === 'suspended') void context.resume();
+    const now = context.currentTime;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const filter = context.createBiquadFilter();
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(1200, now);
+    oscillator.frequency.exponentialRampToValueAtTime(400, now + 0.04);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.045, now + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+    filter.type = 'highpass';
+    filter.frequency.setValueAtTime(300, now);
+
+    oscillator.connect(gain);
+    gain.connect(filter);
+    filter.connect(uiGainRef.current);
+    oscillator.onended = () => {
+      oscillator.disconnect();
+      gain.disconnect();
+      filter.disconnect();
     };
+    oscillator.start(now);
+    oscillator.stop(now + 0.08);
+  };
+
+  useEffect(() => () => {
+    if (timerId.current) window.clearInterval(timerId.current);
+    activeVoices.current.forEach(({ oscillator }) => {
+      if (oscillator.state !== 'stopped') oscillator.stop();
+    });
+    if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
+      void audioCtxRef.current.close();
+    }
   }, []);
 
   return (
-    <AudioContext.Provider value={{ isPlaying, togglePlay, playTick }}>
+    <AudioContext.Provider value={{
+      isPlaying,
+      isMuted,
+      volume,
+      audioError,
+      startMusic,
+      togglePlay,
+      toggleMute,
+      changeVolume,
+      playTick
+    }}>
       {children}
     </AudioContext.Provider>
   );

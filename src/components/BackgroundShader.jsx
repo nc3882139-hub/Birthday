@@ -109,8 +109,8 @@ const BackgroundShader = () => {
           finalColor += vec3(0.55, 0.35, 0.39) * b2 * 0.04;
           finalColor += vec3(0.97, 0.95, 0.92) * b3 * 0.04;
           
-          // 4. Double-layered Floating Champagne Particles (60 Stars)
-          for(float i = 0.0; i < 60.0; i++) {
+          // 4. Floating champagne particles
+          for(float i = 0.0; i < 36.0; i++) {
               float hashX = hash(vec2(i, 11.53));
               float hashY = hash(vec2(i, 45.21));
               
@@ -131,7 +131,7 @@ const BackgroundShader = () => {
               float dist = length(uv - starPos);
               
               // Distinguish background (tiny, dim) vs foreground (larger, bright)
-              float isForeground = step(30.0, i); 
+              float isForeground = step(18.0, i);
               float baseSize = mix(0.0002, 0.0006, isForeground);
               float size = baseSize + 0.0003 * hash(vec2(i, 29.7));
               
@@ -227,8 +227,9 @@ const BackgroundShader = () => {
     if (!prefersReducedMotion) window.addEventListener('mousemove', handleMouseMove);
 
     const syncSize = () => {
-      const w = canvas.clientWidth || 1280;
-      const h = canvas.clientHeight || 720;
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.35);
+      const w = Math.round((canvas.clientWidth || 1280) * pixelRatio);
+      const h = Math.round((canvas.clientHeight || 720) * pixelRatio);
       if (canvas.width !== w || canvas.height !== h) {
         canvas.width = w;
         canvas.height = h;
@@ -262,7 +263,11 @@ const BackgroundShader = () => {
       if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
 
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      if (!prefersReducedMotion) animationFrameId = requestAnimationFrame(render);
+      if (!prefersReducedMotion && !document.hidden) {
+        animationFrameId = requestAnimationFrame(render);
+      } else {
+        animationFrameId = 0;
+      }
     };
 
     renderFrame = render;
@@ -271,11 +276,23 @@ const BackgroundShader = () => {
       syncSize();
       if (prefersReducedMotion) render(0);
     };
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        animationFrameId = 0;
+        return;
+      }
+      if (!prefersReducedMotion && !animationFrameId) {
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
     window.addEventListener('resize', handleResize, { passive: true });
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (resizeObserver) {
         resizeObserver.disconnect();
       }

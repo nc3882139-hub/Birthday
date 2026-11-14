@@ -2,11 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ParallaxTilt from '../components/ParallaxTilt';
 import Balloon from '../components/Balloon';
-import giftBoxImg from '../assets/images/gift-box.png';
+import giftBoxImg from '../assets/images/gift-box.webp';
 import { useAudio } from '../context/AudioContext';
+import MusicControls from '../components/MusicControls';
 
 const GiftReveal = ({ onOpenComplete }) => {
-  const { playTick } = useAudio();
+  const { playTick, startMusic } = useAudio();
   const [isOpening, setIsOpening] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
   const timers = useRef([]);
@@ -18,6 +19,7 @@ const GiftReveal = ({ onOpenComplete }) => {
   const handleOpenGift = () => {
     if (isOpening) return;
     playTick();
+    void startMusic();
     setIsOpening(true);
 
     timers.current.push(window.setTimeout(() => {
@@ -41,10 +43,8 @@ const GiftReveal = ({ onOpenComplete }) => {
 
       {/* Decorative framing balloons around the hero (hidden on small mobile to keep focus centered) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-5 hidden md:block">
-        <Balloon left={6} delay={0.2} duration={8} color="champagne" depth="bg" />
-        <Balloon left={12} delay={1.4} duration={7} color="dusty-rose" depth="mg" />
-        <Balloon left={86} delay={0.8} duration={8.5} color="burgundy" depth="mg" />
-        <Balloon left={92} delay={1.8} duration={7.5} color="cream" depth="bg" />
+        <Balloon id={101} left={7} delay={0.2} duration={8} color="champagne" depth="bg" />
+        <Balloon id={102} left={93} delay={0.8} duration={8.5} color="burgundy" depth="bg" />
       </div>
 
       {/* Main Hero Content */}
@@ -105,6 +105,8 @@ const GiftReveal = ({ onOpenComplete }) => {
                 <img
                   src={giftBoxImg}
                   alt="A luxury gift box with ribbon details"
+                  loading="eager"
+                  fetchPriority="high"
                   className="w-full h-full object-cover select-none transition-all duration-700 group-hover:scale-105 brightness-95"
                   style={{ transform: 'translateZ(-15px)' }}
                 />
@@ -178,6 +180,8 @@ const GiftReveal = ({ onOpenComplete }) => {
           </button>
         </div>
       </motion.main>
+
+      <MusicControls />
 
       {/* Soft warm flash transition */}
       <AnimatePresence>

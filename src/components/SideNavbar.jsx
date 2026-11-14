@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAudio } from '../context/AudioContext';
 
-import beachImg from '../assets/images/beach-memory.png';
-import giftBoxImg from '../assets/images/gift-box.png';
-import cakeImg from '../assets/images/birthday-cake.png';
+import beachImg from '../assets/images/beach-memory.webp';
+import giftBoxImg from '../assets/images/gift-box.webp';
+import cakeImg from '../assets/images/birthday-cake.webp';
 
 const SideNavbar = ({ activeSection, onNavigate }) => {
   const { playTick } = useAudio();
@@ -105,6 +105,7 @@ const SideNavbar = ({ activeSection, onNavigate }) => {
                     <img 
                       src={chapter.img} 
                       alt={chapter.label}
+                      loading="lazy"
                       className="w-full h-16 object-cover rounded-xl border border-white/10" 
                     />
                     <div className="text-[10px] font-medium text-center text-gold tracking-wider font-sans uppercase">

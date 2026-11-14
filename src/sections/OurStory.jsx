@@ -9,12 +9,12 @@ import ParallaxTilt from '../components/ParallaxTilt';
 import { useAudio } from '../context/AudioContext';
 import { SparkleIcon } from '../components/icons';
 
-import beachImg from '../assets/images/beach-memory.png';
-import cafeImg from '../assets/images/cafe-memory.png';
-import cakeImg from '../assets/images/birthday-cake.png';
+import beachImg from '../assets/images/beach-memory.webp';
+import cafeImg from '../assets/images/cafe-memory.webp';
+import cakeImg from '../assets/images/birthday-cake.webp';
 
 const OurStory = ({ onReplay }) => {
-  const { isPlaying, togglePlay, playTick } = useAudio();
+  const { playTick } = useAudio();
   const [activeSection, setActiveSection] = useState('beginning');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [poppedWishes, setPoppedWishes] = useState([]);
@@ -38,13 +38,8 @@ const OurStory = ({ onReplay }) => {
     { id: 2, text: "Wishing you a year filled with endless laughter.", left: 37, delay: 0.8, duration: 6.5, color: 'champagne', depth: 'mg' },
     { id: 3, text: "To a beautiful soul, happy birthday.", left: 63, delay: 0.4, duration: 7.8, color: 'burgundy', depth: 'mg' },
     { id: 4, text: "May love surround you always.", left: 88, delay: 1.1, duration: 6.8, color: 'blush', depth: 'mg' },
-    // Background framing balloons
-    { id: 5, text: "", left: 8, delay: 1.5, duration: 8.5, color: 'cream', depth: 'bg' },
-    { id: 6, text: "", left: 48, delay: 0.5, duration: 9.0, color: 'wine', depth: 'bg' },
-    { id: 7, text: "", left: 90, delay: 2.0, duration: 8.0, color: 'champagne', depth: 'bg' },
-    // Foreground framing balloons
-    { id: 8, text: "", left: 6, delay: 2.2, duration: 6.2, color: 'dusty-rose', depth: 'fg' },
-    { id: 9, text: "", left: 94, delay: 1.7, duration: 6.6, color: 'cream', depth: 'fg' }
+    { id: 5, text: "", left: 4, delay: 1.5, duration: 8.5, color: 'violet', depth: 'bg' },
+    { id: 6, text: "", left: 96, delay: 2.0, duration: 8.0, color: 'cream', depth: 'bg' }
   ];
   
   const [balloons, setBalloons] = useState(initialWishes);
@@ -154,10 +149,6 @@ const OurStory = ({ onReplay }) => {
     if (isEnvelopeClicked) return;
     playTick();
     
-    if (!isPlaying) {
-      togglePlay();
-    }
-    
     setIsEnvelopeClicked(true);
 
     setTypewrittenText('');
@@ -166,9 +157,6 @@ const OurStory = ({ onReplay }) => {
 
   const handleReplayJourney = () => {
     playTick();
-    if (isPlaying) {
-      togglePlay();
-    }
     setBalloons(initialWishes);
     setPoppedWishes([]);
     setIsEnvelopeClicked(false);

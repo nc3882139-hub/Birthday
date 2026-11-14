@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useAudio } from '../context/AudioContext';
-import { VolumeOnIcon, VolumeOffIcon } from './icons';
+import MusicControls from './MusicControls';
 
 const TopNavbar = ({ activeSection, onToggleMenu, onNavigate, isMenuOpen }) => {
-  const { isPlaying, togglePlay, playTick } = useAudio();
+  const { playTick } = useAudio();
 
   const navItems = [
     { label: 'The Beginning', targetId: 'beginning' },
@@ -18,23 +18,18 @@ const TopNavbar = ({ activeSection, onToggleMenu, onNavigate, isMenuOpen }) => {
     onNavigate(targetId);
   };
 
-  const handleAudioToggle = () => {
-    playTick();
-    togglePlay();
-  };
-
   return (
     <motion.nav 
       initial={{ x: '-50%', y: -50, opacity: 0 }}
       animate={{ x: '-50%', y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed top-5 left-1/2 w-[calc(100%-32px)] md:w-[calc(100%-80px)] max-w-5xl z-50 flex justify-between items-center px-6 py-3 rounded-full border border-gold/20 bg-midnight/70 backdrop-blur-[35px] shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+      className="fixed top-5 left-1/2 w-[calc(100%-32px)] md:w-[calc(100%-80px)] max-w-5xl z-50 flex justify-between items-center px-3 py-2 sm:px-6 sm:py-3 rounded-full border border-gold/20 bg-midnight/70 backdrop-blur-[35px] shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
     >
       {/* Brand Title */}
       <button
         type="button"
         aria-label="Go to the beginning"
-        className="border-0 bg-transparent p-0 text-left font-serif text-xl font-semibold tracking-[0.15em] text-gold transition-opacity hover:opacity-85 md:text-2xl"
+        className="whitespace-nowrap border-0 bg-transparent p-0 text-left font-serif text-[11px] font-semibold tracking-[0.12em] text-gold transition-opacity hover:opacity-85 sm:text-xl sm:tracking-[0.15em] md:text-2xl"
         onClick={() => handleNavClick('beginning')}
       >
         <span className="uppercase tracking-[0.18em]">The Celebration</span>
@@ -70,22 +65,8 @@ const TopNavbar = ({ activeSection, onToggleMenu, onNavigate, isMenuOpen }) => {
       </div>
 
       {/* Buttons */}
-      <div className="flex items-center gap-3">
-        {/* Audio Synth Button */}
-        <button
-          onClick={handleAudioToggle}
-          aria-label={isPlaying ? 'Mute ambient music' : 'Play ambient music'}
-          className="p-2 rounded-full border border-gold/20 bg-gold/5 text-gold hover:bg-gold/20 hover:border-gold/40 transition-all duration-300 cursor-pointer flex items-center justify-center relative group"
-        >
-          {isPlaying ? (
-            <VolumeOnIcon className="w-4 h-4 animate-pulse text-gold" />
-          ) : (
-            <VolumeOffIcon className="w-4 h-4 text-parchment/60" />
-          )}
-          <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded text-[10px] bg-midnight border border-gold/30 text-parchment opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap uppercase tracking-wider font-sans">
-            {isPlaying ? 'Mute Music' : 'Play Ambient Chords'}
-          </span>
-        </button>
+      <div className="flex shrink-0 items-center gap-1 sm:gap-3">
+        <MusicControls placement="nav" />
 
         {/* Mobile Hamburger menu */}
         <button

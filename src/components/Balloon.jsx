@@ -5,42 +5,55 @@ import { useAudio } from '../context/AudioContext';
 // Color map for satin/foil balloons
 const BALLOON_PALETTES = {
   'dusty-rose': {
-    bg: 'radial-gradient(circle at 32% 28%, #D4A5AB 0%, #8E5A63 55%, #5A2936 90%)',
+    bg: 'radial-gradient(ellipse at 29% 18%, rgba(255,244,249,0.95) 0%, rgba(255,220,232,0.3) 7%, transparent 23%), radial-gradient(ellipse at 38% 36%, #E8ADB9 0%, #A94E67 46%, #4B1727 100%)',
     border: 'rgba(212, 165, 171, 0.4)',
     string: 'rgba(212, 165, 171, 0.6)',
     glow: 'rgba(142, 90, 99, 0.3)'
   },
   'champagne': {
-    bg: 'radial-gradient(circle at 32% 28%, #FAF0E4 0%, #C9A98A 55%, #8C6F51 90%)',
+    bg: 'radial-gradient(ellipse at 29% 18%, rgba(255,255,247,0.98) 0%, rgba(255,244,218,0.35) 8%, transparent 24%), radial-gradient(ellipse at 40% 36%, #FFF0CC 0%, #C9A064 48%, #67472D 100%)',
     border: 'rgba(201, 169, 138, 0.5)',
     string: 'rgba(201, 169, 138, 0.65)',
     glow: 'rgba(201, 169, 138, 0.35)'
   },
   'burgundy': {
-    bg: 'radial-gradient(circle at 32% 28%, #8C404E 0%, #5A2936 55%, #2D1118 90%)',
+    bg: 'radial-gradient(ellipse at 28% 17%, rgba(255,226,239,0.88) 0%, rgba(247,174,197,0.28) 7%, transparent 23%), radial-gradient(ellipse at 40% 34%, #9E3857 0%, #59172F 50%, #1D0914 100%)',
     border: 'rgba(140, 64, 78, 0.4)',
     string: 'rgba(140, 64, 78, 0.6)',
     glow: 'rgba(90, 41, 54, 0.4)'
   },
   'cream': {
-    bg: 'radial-gradient(circle at 32% 28%, #FFFFFF 0%, #EFE4D5 60%, #C9A98A 90%)',
+    bg: 'radial-gradient(ellipse at 29% 18%, rgba(255,255,255,1) 0%, rgba(255,255,250,0.42) 8%, transparent 24%), radial-gradient(ellipse at 40% 37%, #FFF9EF 0%, #D9C6AA 52%, #70604D 100%)',
     border: 'rgba(239, 228, 213, 0.6)',
     string: 'rgba(239, 228, 213, 0.7)',
     glow: 'rgba(239, 228, 213, 0.25)'
   },
   'blush': {
-    bg: 'radial-gradient(circle at 32% 28%, #FBEBEB 0%, #D8B0B7 55%, #8E5A63 90%)',
+    bg: 'radial-gradient(ellipse at 29% 18%, rgba(255,248,249,0.96) 0%, rgba(255,220,224,0.32) 8%, transparent 24%), radial-gradient(ellipse at 40% 38%, #F2C2C8 0%, #BD737F 48%, #63323E 100%)',
     border: 'rgba(216, 176, 183, 0.5)',
     string: 'rgba(216, 176, 183, 0.65)',
     glow: 'rgba(216, 176, 183, 0.3)'
   },
   'wine': {
-    bg: 'radial-gradient(circle at 32% 28%, #6B2938 0%, #3B1620 60%, #1A090D 95%)',
+    bg: 'radial-gradient(ellipse at 29% 18%, rgba(255,221,228,0.78) 0%, rgba(255,180,197,0.24) 7%, transparent 23%), radial-gradient(ellipse at 40% 36%, #702139 0%, #3B1426 52%, #130810 100%)',
     border: 'rgba(107, 41, 56, 0.4)',
     string: 'rgba(107, 41, 56, 0.55)',
     glow: 'rgba(59, 22, 32, 0.4)'
+  },
+  violet: {
+    bg: 'radial-gradient(ellipse at 29% 18%, rgba(255,244,255,0.9) 0%, rgba(223,190,255,0.3) 8%, transparent 24%), radial-gradient(ellipse at 40% 36%, #9E83BE 0%, #594069 50%, #211526 100%)',
+    border: 'rgba(173, 146, 207, 0.45)',
+    string: 'rgba(197, 171, 225, 0.65)',
+    glow: 'rgba(137, 100, 177, 0.25)'
   }
 };
+
+const BALLOON_SHAPES = [
+  'balloon-shape-classic',
+  'balloon-shape-round',
+  'balloon-shape-oval',
+  'balloon-shape-pear'
+];
 
 const Balloon = ({
   id,
@@ -63,7 +76,7 @@ const Balloon = ({
     if (popTimer.current) window.clearTimeout(popTimer.current);
   }, []);
 
-  const palette = BALLOON_PALETTES[color] || BALLOON_PALETTES['champagne'];
+  const palette = BALLOON_PALETTES[color] || BALLOON_PALETTES.champagne;
 
   // Depth styling configuration
   const depthConfig = {
@@ -73,7 +86,7 @@ const Balloon = ({
       opacity: 0.6,
       zIndex: 5,
       width: 'w-12 sm:w-16 md:w-20',
-      height: 'h-20 sm:h-24 md:h-28'
+      height: 'h-32 sm:h-36 md:h-40'
     },
     mg: {
       scale: 1,
@@ -81,7 +94,7 @@ const Balloon = ({
       opacity: 0.95,
       zIndex: 15,
       width: 'w-16 sm:w-20 md:w-28',
-      height: 'h-24 sm:h-28 md:h-36'
+      height: 'h-40 sm:h-44 md:h-48'
     },
     fg: {
       scale: 1.3,
@@ -89,9 +102,18 @@ const Balloon = ({
       opacity: 0.75,
       zIndex: 25,
       width: 'w-20 sm:w-24 md:w-36',
-      height: 'h-28 sm:h-32 md:h-48'
+      height: 'h-48 sm:h-52 md:h-60'
     }
   }[depth] || {};
+
+  const variation = Number.isFinite(id) ? Math.abs(id) : 0;
+  const balloonShape = BALLOON_SHAPES[variation % BALLOON_SHAPES.length];
+  const scaleVariation = [0.94, 1.04, 0.98, 1.08][variation % 4];
+  const balloonScale = depthConfig.scale * scaleVariation;
+  const interactive = Boolean(wish && onPop);
+  const floatRange = 11 + (variation % 5) * 2;
+  const sway = 4 + (variation % 4) * 1.8;
+  const rotation = (variation % 2 ? 1 : -1) * (1.2 + (variation % 3) * 0.55);
 
   const handleClick = (e) => {
     if (isPopped) return;
@@ -136,17 +158,19 @@ const Balloon = ({
         {!isPopped && (
           <motion.button
             type="button"
-            onClick={handleClick}
+            onClick={interactive ? handleClick : undefined}
+            disabled={!interactive}
+            aria-hidden={!interactive}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             aria-label={wish ? `Pop balloon to reveal: ${wish}` : 'Pop decorative balloon'}
             initial={{ y: 200, opacity: 0 }}
             animate={{
-              y: [0, -16, 0],
-              rotate: [0, 2, -1.5, 0],
-              x: [0, 8, -6, 0],
+              y: [0, -floatRange, -floatRange * 0.42, 0],
+              rotate: [0, rotation, -rotation * 0.72, 0],
+              x: [0, sway, -sway * 0.7, 0],
               opacity: depthConfig.opacity,
-              scale: isHovered ? (depthConfig.scale * 1.08) : depthConfig.scale
+              scale: isHovered ? balloonScale * 1.06 : balloonScale
             }}
             exit={{
               scale: [depthConfig.scale, depthConfig.scale * 1.35, 0],
@@ -161,13 +185,13 @@ const Balloon = ({
                 delay: delay,
               },
               rotate: {
-                duration: duration * 1.2,
+                duration: duration * (1.1 + (variation % 3) * 0.08),
                 repeat: Infinity,
                 ease: 'easeInOut',
                 delay: delay + 0.3,
               },
               x: {
-                duration: duration * 1.4,
+                duration: duration * (1.35 + (variation % 2) * 0.12),
                 repeat: Infinity,
                 ease: 'easeInOut',
                 delay: delay + 0.5,
@@ -179,25 +203,24 @@ const Balloon = ({
               filter: depthConfig.blur,
               transformOrigin: 'bottom center'
             }}
-            className="w-full h-full cursor-pointer relative group flex flex-col items-center justify-center pointer-events-auto border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
+            className={`w-full h-full relative group flex flex-col items-center justify-center border-0 bg-transparent p-0 ${
+              interactive
+                ? 'cursor-pointer pointer-events-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold'
+                : 'pointer-events-none'
+            }`}
           >
-            {/* Realistic Elliptical Satin Balloon Body */}
             <div 
-              className="w-full h-[88%] rounded-t-[50%] rounded-b-[45%] relative shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/20 transition-shadow duration-500 overflow-hidden"
+              className={`balloon-body ${balloonShape} relative w-full h-[58%] overflow-hidden border border-white/20 shadow-[0_18px_40px_rgba(0,0,0,0.42)]`}
               style={{
                 background: palette.bg,
                 borderColor: palette.border,
-                boxShadow: `0 20px 45px rgba(0,0,0,0.45), 0 0 25px ${palette.glow}, inset 0 -8px 20px rgba(0,0,0,0.3)`
+                boxShadow: `0 18px 38px rgba(0,0,0,0.38), 0 0 18px ${palette.glow}, inset 0 -12px 24px rgba(12,4,10,0.46), inset 5px 2px 12px rgba(255,255,255,0.18)`
               }}
             >
-              {/* Primary Top-Left Specular Light Highlight */}
-              <div className="absolute top-[8%] left-[18%] w-[32%] h-[20%] bg-gradient-to-b from-white/60 to-white/0 rounded-full blur-[1px] rotate-[-22deg] pointer-events-none" />
-              
-              {/* Secondary Soft Rim Reflection */}
-              <div className="absolute top-[12%] right-[10%] w-[18%] h-[40%] bg-gradient-to-l from-white/30 to-transparent rounded-full blur-[2px] pointer-events-none" />
-
-              {/* Bottom Rim Ambient Shadow */}
-              <div className="absolute bottom-0 inset-x-0 h-[25%] bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+              <span className="balloon-specular" />
+              <span className="balloon-reflection" />
+              <span className="balloon-rim-light" />
+              <span className="balloon-bottom-shade" />
 
               {/* Wish Heart Emblem (only visible on Midground Interactive Balloons) */}
               {depth === 'mg' && wish && (
@@ -216,20 +239,18 @@ const Balloon = ({
               )}
             </div>
 
-            {/* Balloon Knot Base */}
-            <div 
-              className="w-3.5 h-2.5 rounded-b-sm border-t border-white/20 -mt-0.5 shadow-sm"
-              style={{ backgroundColor: palette.border }}
-            />
+            <span className="balloon-neck" style={{ backgroundColor: palette.border }} />
+            <span className="balloon-knot" style={{ backgroundColor: palette.border }} />
 
-            {/* Swaying Ribbon String */}
-            <svg 
-              className="w-24 h-24 overflow-visible pointer-events-none -mt-0.5"
+            <svg
+              viewBox="0 0 96 58"
+              aria-hidden="true"
+              className="balloon-string -mt-px h-14 w-[72%] overflow-visible pointer-events-none"
               style={{ transformOrigin: 'top center' }}
             >
               <motion.path
-                d="M 48 0 Q 56 30 48 60 Q 40 90 48 110"
-                animate={{ rotate: [2, -2, 2] }}
+                d="M 48 0 C 58 14 39 28 49 43 C 54 49 52 54 49 58"
+                animate={{ rotate: [rotation * 1.1, -rotation * 1.25, rotation * 1.1] }}
                 transition={{
                   duration: duration * 0.9,
                   repeat: Infinity,
