@@ -53,6 +53,7 @@ export const AudioProvider = ({ children }) => {
     filter.connect(ctx.destination);
     
     // play each note of the chord with a light arpeggiation delay
+    let remainingNotes = chordNotes.length;
     chordNotes.forEach((freq, index) => {
       const osc = ctx.createOscillator();
       const oscGain = ctx.createGain();
@@ -66,17 +67,22 @@ export const AudioProvider = ({ children }) => {
       
       osc.connect(oscGain);
       oscGain.connect(masterGain);
+      osc.onended = () => {
+        activeOscillators.current = activeOscillators.current.filter((activeOscillator) => activeOscillator !== osc);
+        osc.disconnect();
+        oscGain.disconnect();
+        remainingNotes -= 1;
+        if (remainingNotes === 0) {
+          masterGain.disconnect();
+          filter.disconnect();
+        }
+      };
       
       osc.start(now + index * 0.08);
       osc.stop(now + 4.9);
       
       activeOscillators.current.push(osc);
     });
-    
-    // clear memory arrays
-    setTimeout(() => {
-      activeOscillators.current = activeOscillators.current.filter(o => o.state !== 'stopped');
-    }, 5500);
   };
 
   const playTick = () => {
@@ -119,6 +125,10 @@ export const AudioProvider = ({ children }) => {
         clearInterval(timerId.current);
         timerId.current = null;
       }
+      activeOscillators.current.forEach((oscillator) => {
+        if (oscillator.state !== 'stopped') oscillator.stop();
+      });
+      activeOscillators.current = [];
       setIsPlaying(false);
     } else {
       setIsPlaying(true);
@@ -131,6 +141,13 @@ export const AudioProvider = ({ children }) => {
     return () => {
       if (timerId.current) {
         clearInterval(timerId.current);
+      }
+      activeOscillators.current.forEach((oscillator) => {
+        if (oscillator.state !== 'stopped') oscillator.stop();
+      });
+      activeOscillators.current = [];
+      if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
+        audioCtxRef.current.close();
       }
     };
   }, []);

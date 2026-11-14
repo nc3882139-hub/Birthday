@@ -34,20 +34,52 @@ const OurStory = ({ onReplay }) => {
 
   // Multi-layered wish balloons with varied colors & depths
   const initialWishes = [
-    { id: 1, text: "May all your dreams take flight this year.", left: 14, delay: 0.2, duration: 7.2, color: 'dusty-rose', depth: 'mg' },
-    { id: 2, text: "Wishing you a year filled with endless laughter.", left: 34, delay: 0.8, duration: 6.5, color: 'champagne', depth: 'mg' },
-    { id: 3, text: "To a beautiful soul, happy birthday.", left: 64, delay: 0.4, duration: 7.8, color: 'burgundy', depth: 'mg' },
-    { id: 4, text: "May love surround you always.", left: 84, delay: 1.1, duration: 6.8, color: 'blush', depth: 'mg' },
+    { id: 1, text: "May all your dreams take flight this year.", left: 12, delay: 0.2, duration: 7.2, color: 'dusty-rose', depth: 'mg' },
+    { id: 2, text: "Wishing you a year filled with endless laughter.", left: 37, delay: 0.8, duration: 6.5, color: 'champagne', depth: 'mg' },
+    { id: 3, text: "To a beautiful soul, happy birthday.", left: 63, delay: 0.4, duration: 7.8, color: 'burgundy', depth: 'mg' },
+    { id: 4, text: "May love surround you always.", left: 88, delay: 1.1, duration: 6.8, color: 'blush', depth: 'mg' },
     // Background framing balloons
     { id: 5, text: "", left: 8, delay: 1.5, duration: 8.5, color: 'cream', depth: 'bg' },
     { id: 6, text: "", left: 48, delay: 0.5, duration: 9.0, color: 'wine', depth: 'bg' },
     { id: 7, text: "", left: 90, delay: 2.0, duration: 8.0, color: 'champagne', depth: 'bg' },
     // Foreground framing balloons
-    { id: 8, text: "", left: 4, delay: 2.2, duration: 6.2, color: 'dusty-rose', depth: 'fg' },
+    { id: 8, text: "", left: 6, delay: 2.2, duration: 6.2, color: 'dusty-rose', depth: 'fg' },
     { id: 9, text: "", left: 94, delay: 1.7, duration: 6.6, color: 'cream', depth: 'fg' }
   ];
   
   const [balloons, setBalloons] = useState(initialWishes);
+
+  useEffect(() => {
+    if (!isEnvelopeClicked) return undefined;
+
+    let typewriterTimer;
+    const revealTimer = window.setTimeout(() => {
+      setIsLetterOpened(true);
+      setIsTyping(true);
+      setTypewrittenText('');
+      setShowHeartFinale(false);
+
+      let charIndex = 0;
+      const typeNextCharacter = () => {
+        if (charIndex < letterText.length) {
+          setTypewrittenText(letterText.slice(0, charIndex + 1));
+          charIndex += 1;
+          typewriterTimer = window.setTimeout(typeNextCharacter, 32);
+          return;
+        }
+
+        setIsTyping(false);
+        typewriterTimer = window.setTimeout(() => setShowHeartFinale(true), 650);
+      };
+
+      typewriterTimer = window.setTimeout(typeNextCharacter, 550);
+    }, 850);
+
+    return () => {
+      window.clearTimeout(revealTimer);
+      window.clearTimeout(typewriterTimer);
+    };
+  }, [isEnvelopeClicked, letterText]);
 
   // Scroll sync active nav states
   useEffect(() => {
@@ -110,7 +142,10 @@ const OurStory = ({ onReplay }) => {
 
   const handleBalloonPop = (id, text, x, y) => {
     if (text) {
-      setPoppedWishes((prev) => [...prev, { id, text, x, y }]);
+      const containerWidth = wishesRef.current?.clientWidth || window.innerWidth;
+      const safeX = Math.max(130, Math.min(containerWidth - 130, x));
+      const safeY = Math.max(100, Math.min(300, y));
+      setPoppedWishes((prev) => [...prev, { id, text, x: safeX, y: safeY }]);
     }
     setBalloons((prev) => prev.filter((b) => b.id !== id));
   };
@@ -125,32 +160,8 @@ const OurStory = ({ onReplay }) => {
     
     setIsEnvelopeClicked(true);
 
-    // Sequence: 1. Envelope Flap opens -> 2. Letter Slides Out -> 3. Typewriter starts
-    setTimeout(() => {
-      setIsLetterOpened(true);
-      setIsTyping(true);
-      setTypewrittenText('');
-      setShowHeartFinale(false);
-
-      let charIndex = 0;
-      const speed = 35;
-
-      const typeWriter = () => {
-        if (charIndex < letterText.length) {
-          const char = letterText.charAt(charIndex);
-          setTypewrittenText((prev) => prev + char);
-          charIndex++;
-          setTimeout(typeWriter, speed);
-        } else {
-          setIsTyping(false);
-          setTimeout(() => {
-            setShowHeartFinale(true);
-          }, 600);
-        }
-      };
-
-      setTimeout(typeWriter, 600);
-    }, 900);
+    setTypewrittenText('');
+    setShowHeartFinale(false);
   };
 
   const handleReplayJourney = () => {
@@ -174,6 +185,7 @@ const OurStory = ({ onReplay }) => {
         activeSection={activeSection}
         onToggleMenu={() => setIsMobileMenuOpen(true)}
         onNavigate={handleNavigate}
+        isMenuOpen={isMobileMenuOpen}
       />
       <SideNavbar
         activeSection={activeSection}
@@ -187,36 +199,53 @@ const OurStory = ({ onReplay }) => {
       />
 
       {/* Main Content Layout */}
-      <main className="relative z-10 pt-[120px] pb-24 lg:pr-72">
+      <main className="relative z-10 pt-[104px] sm:pt-[120px] pb-24 lg:pr-72">
         {/* Scroll Anchor */}
         <div ref={beginningRef} id="beginning" className="h-0 w-0 pointer-events-none" />
 
-        {/* Hero Welcome Header */}
-        <section className="mb-24 px-margin-mobile md:px-margin-desktop text-center relative max-w-4xl mx-auto select-none">
-          <motion.p 
-            initial={{ opacity: 0, letterSpacing: '0.15em' }}
-            animate={{ opacity: 0.8, letterSpacing: '0.25em' }}
-            transition={{ duration: 1.4 }}
-            className="font-sans text-xs md:text-sm text-gold uppercase tracking-[0.25em] mb-4"
+        <section
+          aria-labelledby="birthday-hero-title"
+          className="birthday-hero relative mx-auto mb-24 flex min-h-[calc(100svh-104px)] max-w-7xl flex-col items-center justify-center overflow-hidden px-5 pb-20 pt-10 text-center sm:px-10 lg:mb-32"
+        >
+          <div className="hero-orbit hero-orbit-one" aria-hidden="true" />
+          <div className="hero-orbit hero-orbit-two" aria-hidden="true" />
+          <motion.p
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 0.85, y: 0 }}
+            transition={{ duration: 1, delay: 0.15 }}
+            className="relative z-10 mb-6 font-sans text-[10px] uppercase tracking-[0.34em] text-gold sm:text-xs"
           >
-            A Celebration of Moments
+            A day in your honor <span aria-hidden="true">·</span> Made with love
           </motion.p>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.8, delay: 0.2 }}
-            className="font-serif text-5xl sm:text-6xl md:text-7xl text-parchment text-shimmer mb-5 font-semibold leading-tight"
+          <motion.h1
+            id="birthday-hero-title"
+            initial={{ opacity: 0, y: 30, filter: 'blur(8px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ duration: 1.35, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="relative z-10 max-w-5xl font-serif text-[clamp(3.35rem,9vw,8.5rem)] font-normal leading-[0.82] tracking-[-0.055em] text-ivory"
           >
-            Treasured Memories & Wishes
+            Today Is <span className="hero-title-italic">All About You.</span>
           </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 0.9, y: 0 }}
-            transition={{ duration: 1.4, delay: 0.4 }}
-            className="font-script text-2xl md:text-3xl text-gold/90 max-w-2xl mx-auto leading-relaxed"
+          <motion.p
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 0.82, y: 0 }}
+            transition={{ duration: 1, delay: 0.65 }}
+            className="relative z-10 mt-8 max-w-xl font-serif text-lg leading-relaxed text-parchment/80 sm:mt-10 sm:text-2xl"
           >
-            "Every second spent together is a gift that shines brighter with time."
+            A beautiful soul deserves a celebration as extraordinary as they are.
           </motion.p>
+          <motion.button
+            type="button"
+            onClick={() => handleNavigate('memories')}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1.1 }}
+            className="scroll-cue absolute bottom-8 z-10 inline-flex flex-col items-center gap-3 border-0 bg-transparent text-[9px] uppercase tracking-[0.25em] text-gold/80 transition-colors hover:text-ivory"
+            aria-label="Scroll to the memories"
+          >
+            <span>Scroll to discover</span>
+            <span className="scroll-cue-line" aria-hidden="true" />
+          </motion.button>
         </section>
 
         {/* Memory Gallery Section ("Memories") */}
@@ -230,11 +259,13 @@ const OurStory = ({ onReplay }) => {
           className="mb-32 px-margin-mobile md:px-margin-desktop overflow-hidden relative scroll-mt-28"
         >
           <div className="relative select-none text-center mb-12">
-            <p className="font-script text-3xl text-gold/80 mb-2">Our Story in Pictures</p>
-            <h2 className="font-serif text-4xl md:text-5xl text-center mb-3 text-parchment text-shimmer font-semibold">
-              Treasured Moments
+            <p className="font-sans text-[10px] uppercase tracking-[0.32em] text-gold/80 mb-4">The little things we keep</p>
+            <h2 className="font-serif text-4xl md:text-6xl text-center mb-4 text-ivory font-normal tracking-tight">
+              A life in <span className="hero-title-italic">moments.</span>
             </h2>
-            <div className="w-12 h-0.5 bg-gold/30 mx-auto rounded-full" />
+            <p className="mx-auto max-w-lg font-serif text-lg leading-relaxed text-parchment/65">
+              The kind of moments that stay with us long after the day is done.
+            </p>
           </div>
           
           <div className="flex gap-8 overflow-x-auto pb-10 pt-2 px-4 no-scrollbar snap-x snap-mandatory">
@@ -249,7 +280,6 @@ const OurStory = ({ onReplay }) => {
               alt="Cozy cafe memory photo"
               title="Quiet Evenings"
               description="Coffee, candlelight, and a connection that transcends words."
-              delayFloat={true}
               offset={true}
             />
             <MemoryCard isPlaceholder={true} />
@@ -267,16 +297,16 @@ const OurStory = ({ onReplay }) => {
           className="min-h-[65vh] flex flex-col items-center justify-center px-margin-mobile md:px-margin-desktop py-12 relative overflow-hidden scroll-mt-28"
         >
           <div className="select-none text-center z-10 mb-8">
-            <p className="font-script text-3xl text-gold/80 mb-2">Floating Wishes</p>
-            <h2 className="font-serif text-4xl md:text-5xl text-center mb-3 text-parchment text-shimmer font-semibold">
+            <p className="font-sans text-[10px] uppercase tracking-[0.32em] text-gold/80 mb-4">A few words from the heart</p>
+            <h2 className="font-serif text-4xl md:text-6xl text-center mb-4 text-ivory font-normal tracking-tight">
               Wishes in the Sky
             </h2>
-            <p className="font-sans text-xs md:text-sm text-parchment/70 max-w-xl mx-auto tracking-widest uppercase">
-              Tap a floating balloon to release its golden message
+            <p className="font-serif text-base md:text-lg text-parchment/70 max-w-xl mx-auto">
+              Choose a balloon and let a little birthday wish find its way to you.
             </p>
           </div>
 
-          <div className="relative w-full max-w-5xl h-[440px] mx-auto z-10">
+          <div className="relative w-full max-w-5xl h-[340px] sm:h-[440px] mx-auto z-10">
             {/* Multi-layered Satin Floating Balloons */}
             <AnimatePresence>
               {balloons.map((balloon) => (
@@ -339,13 +369,14 @@ const OurStory = ({ onReplay }) => {
           {/* Envelope Physical Opening Interaction */}
           {!isLetterOpened && (
             <ParallaxTilt maxRotation={8} scale={1.02} className="w-full max-w-lg">
-              <motion.div
+              <motion.button
+                type="button"
+                aria-label="Open the birthday letter"
                 initial={{ y: 80, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 90 }}
                 onClick={handleOpenLetterSequence}
-                onMouseEnter={playTick}
-                className="w-full relative z-20 cursor-pointer flex flex-col items-center group select-none"
+                className="w-full relative z-20 cursor-pointer flex flex-col items-center group select-none border-0 bg-transparent p-0 text-left"
               >
                 {/* 3D Physical Envelope Structure */}
                 <div className="w-full aspect-[1.6/1] bg-gradient-to-b from-[#24151B] to-[#180E12] rounded-2xl border border-gold/30 shadow-[0_30px_70px_rgba(0,0,0,0.7)] relative overflow-hidden flex flex-col items-center justify-center p-8">
@@ -378,7 +409,7 @@ const OurStory = ({ onReplay }) => {
                     <p className="font-sans text-xs text-parchment/70 tracking-[0.2em] uppercase">Tap to unfold this letter</p>
                   </div>
                 </div>
-              </motion.div>
+              </motion.button>
             </ParallaxTilt>
           )}
 
@@ -447,6 +478,33 @@ const OurStory = ({ onReplay }) => {
             </div>
           )}
 
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-24 grid w-full max-w-5xl overflow-hidden rounded-2xl border border-gold/20 bg-[#100B0E]/80 shadow-[0_35px_100px_rgba(0,0,0,0.5)] md:grid-cols-[1.1fr_0.9fr]"
+          >
+            <div className="relative min-h-[280px] overflow-hidden sm:min-h-[380px]">
+              <img
+                src={cakeImg}
+                alt="A candlelit birthday cake beneath warm celebration lights"
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#100B0E]/65 via-transparent to-transparent md:bg-gradient-to-r" />
+            </div>
+            <div className="flex flex-col justify-center px-7 py-10 text-center sm:px-12 md:text-left">
+              <p className="mb-4 font-sans text-[9px] uppercase tracking-[0.3em] text-gold">Here’s to your next chapter</p>
+              <h3 className="font-serif text-4xl font-normal leading-tight tracking-tight text-ivory sm:text-5xl">
+                Make a wish.<br /><span className="hero-title-italic">Then make it yours.</span>
+              </h3>
+              <p className="mt-5 max-w-sm font-serif text-lg leading-relaxed text-parchment/70">
+                May this year bring you more joy, more wonder, and all the little things that make life beautiful.
+              </p>
+            </div>
+          </motion.div>
+
           {/* Replay Button */}
           <div className="mt-16 z-20">
             <motion.button
@@ -468,10 +526,6 @@ const OurStory = ({ onReplay }) => {
       <footer className="w-full flex flex-col sm:flex-row justify-between items-center gap-6 px-margin-mobile md:px-margin-desktop py-8 bg-gradient-to-t from-midnight to-transparent z-40 relative lg:pr-72 border-t border-gold/10 select-none">
         <div className="text-parchment/60 font-sans text-xs tracking-wider order-2 sm:order-1">
           Created with Love • 2026
-        </div>
-        <div className="flex gap-6 order-3 sm:order-2">
-          <span className="text-parchment/60 font-sans text-xs hover:text-gold transition-colors cursor-pointer">Privacy</span>
-          <span className="text-parchment/60 font-sans text-xs hover:text-gold transition-colors cursor-pointer">Terms</span>
         </div>
         <div className="text-gold font-serif text-lg tracking-widest order-1 sm:order-3 text-shimmer font-semibold uppercase">
           priyanshu chakraborty

@@ -1,10 +1,47 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAudio } from '../context/AudioContext';
 import { SparkleIcon, PhotoIcon, HeartIcon, CloseIcon } from './icons';
 
 const MobileMenu = ({ isOpen, onClose, activeSection, onNavigate }) => {
   const { playTick } = useAudio();
+  const panelRef = useRef(null);
+  const closeHandlerRef = useRef(onClose);
+  closeHandlerRef.current = onClose;
+
+  useEffect(() => {
+    if (!isOpen || !panelRef.current) return undefined;
+
+    const panel = panelRef.current;
+    const previousFocus = document.activeElement;
+    const focusableElements = () => panel.querySelectorAll('button:not([disabled])');
+    focusableElements()[0]?.focus();
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        closeHandlerRef.current();
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+      const focusable = focusableElements();
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
+    };
+  }, [isOpen]);
 
   const chapters = [
     { label: 'The Beginning', targetId: 'beginning', icon: <SparkleIcon className="w-5 h-5 text-gold" /> },
@@ -39,6 +76,11 @@ const MobileMenu = ({ isOpen, onClose, activeSection, onNavigate }) => {
 
           {/* Sliding Panel */}
           <motion.div
+            ref={panelRef}
+            id="story-mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Story navigation"
             initial={{ x: '100%', filter: 'blur(8px)' }}
             animate={{ x: 0, filter: 'blur(0px)' }}
             exit={{ x: '100%', filter: 'blur(8px)' }}
@@ -52,6 +94,7 @@ const MobileMenu = ({ isOpen, onClose, activeSection, onNavigate }) => {
               </div>
               <button
                 onClick={handleClose}
+                aria-label="Close story navigation"
                 className="p-2 rounded-full border border-gold/20 bg-gold/10 text-gold hover:bg-gold hover:text-midnight transition-all duration-300 cursor-pointer flex items-center justify-center"
               >
                 <CloseIcon className="w-5 h-5" />
@@ -63,13 +106,14 @@ const MobileMenu = ({ isOpen, onClose, activeSection, onNavigate }) => {
               {chapters.map((chapter, index) => {
                 const isActive = activeSection === chapter.targetId;
                 return (
-                  <motion.div
+                  <motion.button
+                    type="button"
                     key={chapter.targetId}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.08, ease: 'easeOut' }}
                     onClick={() => handleNavigate(chapter.targetId)}
-                    className={`flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all duration-300 min-h-[54px] select-none ${
+                    className={`flex w-full items-center gap-4 rounded-2xl border-0 bg-transparent p-4 text-left cursor-pointer transition-all duration-300 min-h-[54px] select-none ${
                       isActive
                         ? 'text-gold border-r-2 border-gold bg-gold/10 pl-5'
                         : 'text-parchment/70 hover:bg-gold/5 hover:text-gold'
@@ -79,7 +123,7 @@ const MobileMenu = ({ isOpen, onClose, activeSection, onNavigate }) => {
                       {chapter.icon}
                     </div>
                     <span className="font-sans text-xs uppercase tracking-[0.15em]">{chapter.label}</span>
-                  </motion.div>
+                  </motion.button>
                 );
               })}
             </div>

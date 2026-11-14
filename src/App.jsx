@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
 import Lenis from 'lenis';
 import { AudioProvider } from './context/AudioContext';
 import BackgroundShader from './components/BackgroundShader';
@@ -12,6 +12,7 @@ function AppContent() {
   // Initialize high-performance Lenis smooth scroll
   useEffect(() => {
     if (view !== 'story') return; // Only apply smooth scrolling on the main story layout
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const lenis = new Lenis({
       duration: 1.4, // Slightly longer duration for cinematic feel
@@ -27,17 +28,18 @@ function AppContent() {
     }
     rafId = requestAnimationFrame(raf);
 
-    // Sync Lenis with scroll triggers
-    window.addEventListener('resize', () => lenis.resize());
+    const handleResize = () => lenis.resize();
+    window.addEventListener('resize', handleResize);
 
     return () => {
+      window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(rafId);
       lenis.destroy();
     };
   }, [view]);
 
   return (
-    <div className="relative min-h-screen w-full bg-[#0c0f10] text-[#e1e3e4] overflow-hidden">
+    <div className="relative min-h-screen w-full overflow-hidden bg-[#080808] text-[#F8F3EC]">
       {/* Background Shader is mounted globally so it animates continuously */}
       <BackgroundShader />
 
@@ -46,9 +48,9 @@ function AppContent() {
         {view === 'gift' ? (
           <motion.div
             key="gift-view"
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.96, y: -20, filter: 'blur(4px)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="w-full min-h-screen"
           >
@@ -57,9 +59,9 @@ function AppContent() {
         ) : (
           <motion.div
             key="story-view"
-            initial={{ opacity: 0, y: 30, scale: 1.01, filter: 'blur(4px)' }}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, scale: 0.98, y: 20 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
             className="w-full min-h-screen"
           >
@@ -74,7 +76,9 @@ function AppContent() {
 function App() {
   return (
     <AudioProvider>
-      <AppContent />
+      <MotionConfig reducedMotion="user">
+        <AppContent />
+      </MotionConfig>
     </AudioProvider>
   );
 }

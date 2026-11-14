@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAudio } from '../context/AudioContext';
 
 import beachImg from '../assets/images/beach-memory.png';
-import cafeImg from '../assets/images/cafe-memory.png';
 import giftBoxImg from '../assets/images/gift-box.png';
 import cakeImg from '../assets/images/birthday-cake.png';
 
@@ -57,12 +56,16 @@ const SideNavbar = ({ activeSection, onNavigate }) => {
           const isHovered = hoveredChapter === chapter.targetId;
 
           return (
-            <div
+            <button
+              type="button"
               key={chapter.targetId}
               onClick={() => handleNav(chapter.targetId)}
               onMouseEnter={() => setHoveredChapter(chapter.targetId)}
               onMouseLeave={() => setHoveredChapter(null)}
-              className="relative flex items-center gap-3 cursor-pointer group py-1"
+              onFocus={() => setHoveredChapter(chapter.targetId)}
+              onBlur={() => setHoveredChapter(null)}
+              aria-current={isActive ? 'location' : undefined}
+              className="relative flex items-center gap-3 cursor-pointer group border-0 bg-transparent py-1 text-left"
             >
               {/* Chapter dot indicator */}
               <div 
@@ -110,7 +113,7 @@ const SideNavbar = ({ activeSection, onNavigate }) => {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </button>
           );
         })}
       </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ParallaxTilt from '../components/ParallaxTilt';
 import Balloon from '../components/Balloon';
@@ -9,21 +9,24 @@ const GiftReveal = ({ onOpenComplete }) => {
   const { playTick } = useAudio();
   const [isOpening, setIsOpening] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
+  const timers = useRef([]);
+
+  useEffect(() => () => {
+    timers.current.forEach(window.clearTimeout);
+  }, []);
 
   const handleOpenGift = () => {
     if (isOpening) return;
     playTick();
     setIsOpening(true);
 
-    // After 1 second, trigger the soft warm flash
-    setTimeout(() => {
+    timers.current.push(window.setTimeout(() => {
       setShowFlash(true);
-    }, 1000);
+    }, 1150));
 
-    // After 2 seconds, trigger callback to load the story view
-    setTimeout(() => {
+    timers.current.push(window.setTimeout(() => {
       onOpenComplete();
-    }, 2000);
+    }, 2200));
   };
 
   const handleSkip = () => {
@@ -59,7 +62,7 @@ const GiftReveal = ({ onOpenComplete }) => {
             transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
             className="font-label-md text-xs md:text-label-md uppercase text-gold tracking-[0.25em] mb-4"
           >
-            A Special Birthday Keepsake
+            A Birthday Keepsake
           </motion.p>
           <motion.h1 
             initial={{ opacity: 0, y: 15 }}
@@ -67,7 +70,7 @@ const GiftReveal = ({ onOpenComplete }) => {
             transition={{ delay: 0.2, duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
             className="font-serif text-4xl sm:text-5xl md:text-6xl text-parchment text-shimmer mb-4 leading-tight drop-shadow-md font-semibold"
           >
-            A Surprise Awaits You
+            A Little Something,<br />Just For You
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 10 }}
@@ -75,25 +78,25 @@ const GiftReveal = ({ onOpenComplete }) => {
             transition={{ delay: 0.5, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
             className="font-script text-2xl md:text-3xl text-gold/90 max-w-xl mx-auto tracking-wide leading-relaxed"
           >
-            Step into a quiet, romantic journey crafted with love.
+            Some moments deserve to be celebrated differently.
           </motion.p>
         </div>
 
         {/* Interactive 3D Gift Box Card */}
-        <div
-          onClick={handleOpenGift}
-          onMouseEnter={playTick}
-          className="relative w-full max-w-md mb-10 group cursor-pointer"
-        >
+        <div className="relative w-full max-w-md mb-10 group">
           {/* Subtle Champagne Light Glow */}
           <div className="absolute inset-[-12%] bg-[radial-gradient(circle,rgba(201,169,138,0.2)_0%,transparent_70%)] rounded-full blur-3xl opacity-50 group-hover:opacity-90 group-hover:scale-105 transition-all duration-1000 pointer-events-none" />
 
           {/* 3D Parallax Tilt Card */}
           <ParallaxTilt maxRotation={10} scale={1.03}>
-            <motion.div
-              animate={isOpening ? { scale: 1.06, y: -12, filter: 'brightness(1.3) blur(1px)' } : { scale: 1, y: 0 }}
+            <motion.button
+              type="button"
+              onClick={handleOpenGift}
+              disabled={isOpening}
+              aria-label="Open your birthday gift"
+              animate={isOpening ? { scale: 1.04, y: -8, rotateX: -7, filter: 'brightness(1.25)' } : { scale: 1, y: 0, rotateX: 0 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="relative rounded-3xl overflow-hidden border border-gold/20 bg-wine-dark/40 backdrop-blur-2xl shadow-[0_30px_70px_rgba(0,0,0,0.6)] z-10"
+              className="relative block w-full rounded-3xl overflow-hidden border border-gold/20 bg-wine-dark/40 backdrop-blur-2xl shadow-[0_30px_70px_rgba(0,0,0,0.6)] z-10 cursor-pointer disabled:cursor-wait"
             >
               {/* Gold double light edge overlay */}
               <div className="absolute inset-0 border border-gold/25 rounded-3xl pointer-events-none z-30 group-hover:border-gold/50 transition-colors duration-500" />
@@ -113,8 +116,29 @@ const GiftReveal = ({ onOpenComplete }) => {
                   className="absolute inset-0 bg-[radial-gradient(circle,rgba(248,243,236,0.95)_0%,transparent_70%)] mix-blend-screen pointer-events-none z-20"
                 />
               </div>
-            </motion.div>
+            </motion.button>
           </ParallaxTilt>
+
+          <div className="absolute inset-0 pointer-events-none z-20 overflow-visible" aria-hidden="true">
+            {Array.from({ length: 14 }, (_, index) => (
+              <motion.span
+                key={index}
+                initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+                animate={isOpening ? {
+                  opacity: [0, 0.9, 0],
+                  scale: [0.2, 1, 0.4],
+                  x: (index % 2 ? 1 : -1) * (28 + (index % 4) * 22),
+                  y: -70 - (index % 5) * 24,
+                } : {}}
+                transition={{ duration: 1.25, delay: (index % 5) * 0.05, ease: 'easeOut' }}
+                style={{
+                  left: `${18 + ((index * 17) % 64)}%`,
+                  top: `${38 + ((index * 13) % 38)}%`,
+                }}
+                className="absolute w-1 h-1 rounded-full bg-gold shadow-[0_0_14px_rgba(201,169,138,0.9)]"
+              />
+            ))}
+          </div>
 
           {/* Bounce Indicator Cue */}
           {!isOpening && (
@@ -139,7 +163,7 @@ const GiftReveal = ({ onOpenComplete }) => {
             disabled={isOpening}
             className="px-9 py-4 rounded-full border border-gold/40 text-parchment bg-gold/10 font-label-md text-xs md:text-sm tracking-[0.15em] uppercase hover:bg-gold hover:text-midnight hover:shadow-[0_0_35px_rgba(201,169,138,0.4)] transition-all duration-300 flex items-center gap-3 select-none btn-sheen cursor-pointer"
           >
-            {isOpening ? 'Unfolding Surprise...' : 'Open My Gift'}
+            {isOpening ? 'Unfolding Surprise...' : 'Open Your Gift'}
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
               <path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.5 2.5 0 0 0-5-0.5c0 .08.01.15.02.23L12 5.5l-1.02-.77c.01-.08.02-.15.02-.23a2.5 2.5 0 0 0-5-0.5c0 .35.07.69.18 1H4a2 2 0 0 0-2 2v3c0 .8.5 1.47 1.22 1.78L3 20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2l-.22-7.22C21.5 12.47 22 11.8 22 11V8a2 2 0 0 0-2-2zM9 13H5v-2h4v2zm10 0h-4v-2h4v2z" />
             </svg>

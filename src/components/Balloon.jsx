@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAudio } from '../context/AudioContext';
 
@@ -57,6 +57,11 @@ const Balloon = ({
   const [isPopped, setIsPopped] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [particles, setParticles] = useState([]);
+  const popTimer = useRef(null);
+
+  useEffect(() => () => {
+    if (popTimer.current) window.clearTimeout(popTimer.current);
+  }, []);
 
   const palette = BALLOON_PALETTES[color] || BALLOON_PALETTES['champagne'];
 
@@ -67,24 +72,24 @@ const Balloon = ({
       blur: 'blur(2.5px)',
       opacity: 0.6,
       zIndex: 5,
-      width: 'w-16 md:w-20',
-      height: 'h-22 md:h-28'
+      width: 'w-12 sm:w-16 md:w-20',
+      height: 'h-20 sm:h-24 md:h-28'
     },
     mg: {
       scale: 1,
       blur: 'blur(0px)',
       opacity: 0.95,
       zIndex: 15,
-      width: 'w-24 md:w-28',
-      height: 'h-32 md:h-36'
+      width: 'w-16 sm:w-20 md:w-28',
+      height: 'h-24 sm:h-28 md:h-36'
     },
     fg: {
       scale: 1.3,
       blur: 'blur(3.5px)',
       opacity: 0.75,
       zIndex: 25,
-      width: 'w-32 md:w-36',
-      height: 'h-40 md:h-48'
+      width: 'w-20 sm:w-24 md:w-36',
+      height: 'h-28 sm:h-32 md:h-48'
     }
   }[depth] || {};
 
@@ -111,7 +116,7 @@ const Balloon = ({
       const x = rect.left - parentRect.left + rect.width / 2;
       const y = rect.top - parentRect.top;
 
-      setTimeout(() => {
+      popTimer.current = window.setTimeout(() => {
         onPop(id, wish, x, y);
       }, 350);
     }
@@ -121,17 +126,20 @@ const Balloon = ({
     <div 
       style={{
         left: `${left}%`,
+        transform: 'translateX(-50%)',
         top: top !== 'auto' ? top : undefined,
         zIndex: depthConfig.zIndex
       }}
-      className={`absolute bottom-0 ${depthConfig.width} ${depthConfig.height} select-none`}
+      className={`absolute bottom-0 ${depthConfig.width} ${depthConfig.height} select-none ${depth === 'mg' ? 'flex' : 'hidden sm:flex'}`}
     >
       <AnimatePresence>
         {!isPopped && (
-          <motion.div
+          <motion.button
+            type="button"
             onClick={handleClick}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            aria-label={wish ? `Pop balloon to reveal: ${wish}` : 'Pop decorative balloon'}
             initial={{ y: 200, opacity: 0 }}
             animate={{
               y: [0, -16, 0],
@@ -171,7 +179,7 @@ const Balloon = ({
               filter: depthConfig.blur,
               transformOrigin: 'bottom center'
             }}
-            className="w-full h-full cursor-pointer relative group flex flex-col items-center justify-center pointer-events-auto"
+            className="w-full h-full cursor-pointer relative group flex flex-col items-center justify-center pointer-events-auto border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
           >
             {/* Realistic Elliptical Satin Balloon Body */}
             <div 
@@ -221,25 +229,20 @@ const Balloon = ({
             >
               <motion.path
                 d="M 48 0 Q 56 30 48 60 Q 40 90 48 110"
-                animate={{
-                  d: [
-                    "M 48 0 Q 56 30 48 60 Q 40 90 48 110",
-                    "M 48 0 Q 40 30 48 60 Q 56 90 48 110",
-                    "M 48 0 Q 56 30 48 60 Q 40 90 48 110"
-                  ]
-                }}
+                animate={{ rotate: [2, -2, 2] }}
                 transition={{
                   duration: duration * 0.9,
                   repeat: Infinity,
                   ease: "easeInOut",
                   delay: delay
                 }}
+                style={{ transformOrigin: '48px 0' }}
                 stroke={palette.string}
                 strokeWidth="1.4"
                 fill="transparent"
               />
             </svg>
-          </motion.div>
+          </motion.button>
         )}
       </AnimatePresence>
 

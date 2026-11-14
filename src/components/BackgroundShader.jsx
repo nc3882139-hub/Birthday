@@ -18,6 +18,8 @@ const BackgroundShader = () => {
 
     let animationFrameId;
     let resizeObserver;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let renderFrame = () => {};
 
     const vs = `
       attribute vec2 a_position;
@@ -222,7 +224,7 @@ const BackgroundShader = () => {
       }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    if (!prefersReducedMotion) window.addEventListener('mousemove', handleMouseMove);
 
     const syncSize = () => {
       const w = canvas.clientWidth || 1280;
@@ -236,7 +238,10 @@ const BackgroundShader = () => {
     };
 
     if (typeof ResizeObserver !== 'undefined') {
-      resizeObserver = new ResizeObserver(syncSize);
+      resizeObserver = new ResizeObserver(() => {
+        syncSize();
+        if (prefersReducedMotion) renderFrame(0);
+      });
       resizeObserver.observe(canvas);
     }
     syncSize();
@@ -257,13 +262,20 @@ const BackgroundShader = () => {
       if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
 
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      animationFrameId = requestAnimationFrame(render);
+      if (!prefersReducedMotion) animationFrameId = requestAnimationFrame(render);
     };
 
+    renderFrame = render;
     render(0);
+    const handleResize = () => {
+      syncSize();
+      if (prefersReducedMotion) render(0);
+    };
+    window.addEventListener('resize', handleResize, { passive: true });
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', handleResize);
       if (resizeObserver) {
         resizeObserver.disconnect();
       }
