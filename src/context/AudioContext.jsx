@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-
-const AudioContext = createContext(null);
+import React, { useEffect, useRef, useState } from 'react';
+import AudioContext from './audioContextValue';
 
 const CHORD_PROGRESSIONS = [
   { pad: [130.81, 196, 246.94, 293.66], piano: [392, 493.88, 587.33, 493.88] },
@@ -34,7 +33,7 @@ export const AudioProvider = ({ children }) => {
       const musicGain = context.createGain();
       const uiGain = context.createGain();
       musicGain.gain.value = 0;
-      uiGain.gain.value = 0.18;
+      uiGain.gain.value = isMutedRef.current ? 0 : 0.18;
       musicGain.connect(context.destination);
       uiGain.connect(context.destination);
 
@@ -177,6 +176,11 @@ export const AudioProvider = ({ children }) => {
     isMutedRef.current = nextMuted;
     setIsMuted(nextMuted);
     rampMusicGain(nextMuted || !isPlayingRef.current ? 0 : volumeRef.current, 0.12);
+    const context = audioCtxRef.current;
+    const uiGain = uiGainRef.current;
+    if (context && uiGain) {
+      uiGain.gain.setTargetAtTime(nextMuted ? 0 : 0.18, context.currentTime, 0.04);
+    }
   };
 
   const changeVolume = (nextVolume) => {
@@ -186,7 +190,20 @@ export const AudioProvider = ({ children }) => {
     rampMusicGain(isMutedRef.current || !isPlayingRef.current ? 0 : next, 0.12);
   };
 
-  const playTick = () => {
+  const resumeAudioContext = async (context, soundLabel) => {
+    if (context.state !== 'suspended') return true;
+
+    try {
+      await context.resume();
+      return true;
+    } catch (error) {
+      console.error(`Unable to resume audio for ${soundLabel}.`, error);
+      setAudioError('Sound effects are unavailable in this browser.');
+      return false;
+    }
+  };
+
+  const playTick = async () => {
     let context;
     try {
       context = getAudioContext();
@@ -195,7 +212,7 @@ export const AudioProvider = ({ children }) => {
       return;
     }
 
-    if (context.state === 'suspended') void context.resume();
+    if (!await resumeAudioContext(context, 'the interface sound')) return;
     const now = context.currentTime;
     const oscillator = context.createOscillator();
     const gain = context.createGain();
@@ -222,6 +239,42 @@ export const AudioProvider = ({ children }) => {
     oscillator.stop(now + 0.08);
   };
 
+  const playPop = async () => {
+    let context;
+    try {
+      context = getAudioContext();
+    } catch (error) {
+      console.error('Unable to play the balloon sound.', error);
+      return;
+    }
+
+    if (!await resumeAudioContext(context, 'the balloon sound')) return;
+    const now = context.currentTime;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const filter = context.createBiquadFilter();
+
+    oscillator.type = 'triangle';
+    oscillator.frequency.setValueAtTime(190, now);
+    oscillator.frequency.exponentialRampToValueAtTime(70, now + 0.11);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.055, now + 0.006);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(900, now);
+
+    oscillator.connect(filter);
+    filter.connect(gain);
+    gain.connect(uiGainRef.current);
+    oscillator.onended = () => {
+      oscillator.disconnect();
+      gain.disconnect();
+      filter.disconnect();
+    };
+    oscillator.start(now);
+    oscillator.stop(now + 0.13);
+  };
+
   useEffect(() => () => {
     if (timerId.current) window.clearInterval(timerId.current);
     activeVoices.current.forEach(({ oscillator }) => {
@@ -242,19 +295,10 @@ export const AudioProvider = ({ children }) => {
       togglePlay,
       toggleMute,
       changeVolume,
-      playTick
+      playTick,
+      playPop
     }}>
       {children}
     </AudioContext.Provider>
   );
 };
-
-export const useAudio = () => {
-  const context = useContext(AudioContext);
-  if (!context) {
-    throw new Error('useAudio must be used within an AudioProvider');
-  }
-  return context;
-};
-
-export default AudioContext;

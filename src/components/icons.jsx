@@ -18,8 +18,8 @@ export const HeartIcon = ({ className = 'w-6 h-6', ...props }) => (
   >
     <defs>
       <linearGradient id="heartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#ff758c" />
-        <stop offset="100%" stopColor="#ff7eb3" />
+        <stop offset="0%" stopColor="#FF4D9D" />
+        <stop offset="100%" stopColor="#8B5CF6" />
       </linearGradient>
     </defs>
     <path

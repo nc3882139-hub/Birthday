@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ParallaxTilt from '../components/ParallaxTilt';
 import Balloon from '../components/Balloon';
 import giftBoxImg from '../assets/images/gift-box.webp';
-import { useAudio } from '../context/AudioContext';
+import { useAudio } from '../context/useAudio';
 import MusicControls from '../components/MusicControls';
+import { birthdayContent } from '../content/birthdayContent';
 
 const GiftReveal = ({ onOpenComplete }) => {
   const { playTick, startMusic } = useAudio();
@@ -49,6 +50,7 @@ const GiftReveal = ({ onOpenComplete }) => {
 
       {/* Main Hero Content */}
       <motion.main
+        aria-labelledby="gift-title"
         initial={{ opacity: 0, y: 35 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
@@ -62,9 +64,10 @@ const GiftReveal = ({ onOpenComplete }) => {
             transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
             className="font-label-md text-xs md:text-label-md uppercase text-gold tracking-[0.25em] mb-4"
           >
-            A Birthday Keepsake
+            A Birthday Keepsake for {birthdayContent.recipient}
           </motion.p>
-          <motion.h1 
+          <motion.h1
+            id="gift-title"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 1.8, ease: [0.16, 1, 0.3, 1] }}

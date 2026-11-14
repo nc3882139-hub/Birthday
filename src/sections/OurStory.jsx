@@ -6,12 +6,24 @@ import MobileMenu from '../components/MobileMenu';
 import MemoryCard from '../components/MemoryCard';
 import Balloon from '../components/Balloon';
 import ParallaxTilt from '../components/ParallaxTilt';
-import { useAudio } from '../context/AudioContext';
+import { useAudio } from '../context/useAudio';
 import { SparkleIcon } from '../components/icons';
-
-import beachImg from '../assets/images/beach-memory.webp';
-import cafeImg from '../assets/images/cafe-memory.webp';
 import cakeImg from '../assets/images/birthday-cake.webp';
+import { birthdayContent } from '../content/birthdayContent';
+
+const initialBalloons = [
+  ...birthdayContent.wishes.map((text, index) => ({
+    id: index + 1,
+    text,
+    left: [12, 37, 63, 88][index],
+    delay: [0.2, 0.8, 0.4, 1.1][index],
+    duration: [7.2, 6.5, 7.8, 6.8][index],
+    color: ['dusty-rose', 'champagne', 'burgundy', 'blush'][index],
+    depth: 'mg'
+  })),
+  { id: 5, text: '', left: 4, delay: 1.5, duration: 8.5, color: 'violet', depth: 'bg' },
+  { id: 6, text: '', left: 96, delay: 2, duration: 8, color: 'cream', depth: 'bg' }
+];
 
 const OurStory = ({ onReplay }) => {
   const { playTick } = useAudio();
@@ -24,30 +36,30 @@ const OurStory = ({ onReplay }) => {
   const [showHeartFinale, setShowHeartFinale] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
 
-  // References for scroll tracking
   const beginningRef = useRef(null);
   const memoriesRef = useRef(null);
+  const littleThingsRef = useRef(null);
   const wishesRef = useRef(null);
+  const wishesStageRef = useRef(null);
+  const letterRef = useRef(null);
   const finaleRef = useRef(null);
 
-  const letterText = "Every moment spent together has been a chapter in a beautiful story. As we celebrate you today, know that my greatest wish is for your happiness to shine as brightly as you do. Thank you for being you.";
-
-  // Multi-layered wish balloons with varied colors & depths
-  const initialWishes = [
-    { id: 1, text: "May all your dreams take flight this year.", left: 12, delay: 0.2, duration: 7.2, color: 'dusty-rose', depth: 'mg' },
-    { id: 2, text: "Wishing you a year filled with endless laughter.", left: 37, delay: 0.8, duration: 6.5, color: 'champagne', depth: 'mg' },
-    { id: 3, text: "To a beautiful soul, happy birthday.", left: 63, delay: 0.4, duration: 7.8, color: 'burgundy', depth: 'mg' },
-    { id: 4, text: "May love surround you always.", left: 88, delay: 1.1, duration: 6.8, color: 'blush', depth: 'mg' },
-    { id: 5, text: "", left: 4, delay: 1.5, duration: 8.5, color: 'violet', depth: 'bg' },
-    { id: 6, text: "", left: 96, delay: 2.0, duration: 8.0, color: 'cream', depth: 'bg' }
-  ];
-  
-  const [balloons, setBalloons] = useState(initialWishes);
+  const [balloons, setBalloons] = useState(initialBalloons);
+  const letterText = birthdayContent.letter;
 
   useEffect(() => {
     if (!isEnvelopeClicked) return undefined;
 
     let typewriterTimer;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      setIsLetterOpened(true);
+      setTypewrittenText(letterText);
+      setIsTyping(false);
+      setShowHeartFinale(true);
+      return undefined;
+    }
+
     const revealTimer = window.setTimeout(() => {
       setIsLetterOpened(true);
       setIsTyping(true);
@@ -76,12 +88,13 @@ const OurStory = ({ onReplay }) => {
     };
   }, [isEnvelopeClicked, letterText]);
 
-  // Scroll sync active nav states
   useEffect(() => {
     const refs = [
       { id: 'beginning', ref: beginningRef },
       { id: 'memories', ref: memoriesRef },
+      { id: 'little-things', ref: littleThingsRef },
       { id: 'wishes', ref: wishesRef },
+      { id: 'letter', ref: letterRef },
       { id: 'finale', ref: finaleRef }
     ];
 
@@ -94,7 +107,7 @@ const OurStory = ({ onReplay }) => {
     const observerCallback = (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          const matched = refs.find(r => r.ref.current === entry.target);
+          const matched = refs.find((chapter) => chapter.ref.current === entry.target);
           if (matched) {
             setActiveSection(matched.id);
           }
@@ -106,7 +119,9 @@ const OurStory = ({ onReplay }) => {
     
     if (beginningRef.current) observer.observe(beginningRef.current);
     if (memoriesRef.current) observer.observe(memoriesRef.current);
+    if (littleThingsRef.current) observer.observe(littleThingsRef.current);
     if (wishesRef.current) observer.observe(wishesRef.current);
+    if (letterRef.current) observer.observe(letterRef.current);
     if (finaleRef.current) observer.observe(finaleRef.current);
 
     return () => {
@@ -115,31 +130,31 @@ const OurStory = ({ onReplay }) => {
   }, []);
 
   const handleNavigate = (targetId) => {
-    let targetRef;
-    if (targetId === 'beginning') {
-      targetRef = beginningRef;
-    } else if (targetId === 'memories') {
-      targetRef = memoriesRef;
-    } else if (targetId === 'wishes') {
-      targetRef = wishesRef;
-    } else if (targetId === 'finale') {
-      targetRef = finaleRef;
-    }
+    const chapterRefs = {
+      beginning: beginningRef,
+      memories: memoriesRef,
+      'little-things': littleThingsRef,
+      wishes: wishesRef,
+      letter: letterRef,
+      finale: finaleRef
+    };
+    const targetRef = chapterRefs[targetId];
 
     if (targetRef && targetRef.current) {
-      const yOffset = -100;
       const element = targetRef.current;
-      const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+      const y = element.getBoundingClientRect().top + window.scrollY - 100;
+      const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+      window.scrollTo({ top: Math.max(0, y), behavior });
       setActiveSection(targetId);
     }
   };
 
   const handleBalloonPop = (id, text, x, y) => {
     if (text) {
-      const containerWidth = wishesRef.current?.clientWidth || window.innerWidth;
-      const safeX = Math.max(130, Math.min(containerWidth - 130, x));
-      const safeY = Math.max(100, Math.min(300, y));
+      const containerWidth = wishesStageRef.current?.clientWidth || window.innerWidth;
+      const containerHeight = wishesStageRef.current?.clientHeight || 340;
+      const safeX = Math.max(120, Math.min(containerWidth - 120, x));
+      const safeY = Math.max(80, Math.min(containerHeight - 70, y));
       setPoppedWishes((prev) => [...prev, { id, text, x: safeX, y: safeY }]);
     }
     setBalloons((prev) => prev.filter((b) => b.id !== id));
@@ -157,7 +172,7 @@ const OurStory = ({ onReplay }) => {
 
   const handleReplayJourney = () => {
     playTick();
-    setBalloons(initialWishes);
+    setBalloons(initialBalloons);
     setPoppedWishes([]);
     setIsEnvelopeClicked(false);
     setIsLetterOpened(false);
@@ -166,8 +181,24 @@ const OurStory = ({ onReplay }) => {
     onReplay();
   };
 
+  const handleReplayLetter = () => {
+    playTick();
+    setIsEnvelopeClicked(false);
+    setIsLetterOpened(false);
+    setIsTyping(false);
+    setTypewrittenText('');
+    setShowHeartFinale(false);
+  };
+
   return (
     <div className="relative min-h-screen">
+      <a
+        href="#beginning"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[120] focus:rounded-full focus:bg-midnight focus:px-5 focus:py-3 focus:text-gold"
+      >
+        Skip to the birthday story
+      </a>
+
       {/* Top and Side Navbars */}
       <TopNavbar
         activeSection={activeSection}
@@ -188,12 +219,11 @@ const OurStory = ({ onReplay }) => {
 
       {/* Main Content Layout */}
       <main className="relative z-10 pt-[104px] sm:pt-[120px] pb-24 lg:pr-72">
-        {/* Scroll Anchor */}
-        <div ref={beginningRef} id="beginning" className="h-0 w-0 pointer-events-none" />
-
         <section
+          ref={beginningRef}
+          id="beginning"
           aria-labelledby="birthday-hero-title"
-          className="birthday-hero relative mx-auto mb-24 flex min-h-[calc(100svh-104px)] max-w-7xl flex-col items-center justify-center overflow-hidden px-5 pb-20 pt-10 text-center sm:px-10 lg:mb-32"
+          className="birthday-hero relative mx-auto mb-24 flex min-h-[calc(100svh-104px)] max-w-7xl flex-col items-center justify-center overflow-clip px-5 pb-20 pt-10 text-center sm:px-10 lg:mb-32 scroll-mt-28"
         >
           <div className="hero-orbit hero-orbit-one" aria-hidden="true" />
           <div className="hero-orbit hero-orbit-two" aria-hidden="true" />
@@ -203,7 +233,7 @@ const OurStory = ({ onReplay }) => {
             transition={{ duration: 1, delay: 0.15 }}
             className="relative z-10 mb-6 font-sans text-[10px] uppercase tracking-[0.34em] text-gold sm:text-xs"
           >
-            A day in your honor <span aria-hidden="true">·</span> Made with love
+            For {birthdayContent.recipient} <span aria-hidden="true">·</span> Made with love
           </motion.p>
           <motion.h1
             id="birthday-hero-title"
@@ -220,7 +250,7 @@ const OurStory = ({ onReplay }) => {
             transition={{ duration: 1, delay: 0.65 }}
             className="relative z-10 mt-8 max-w-xl font-serif text-lg leading-relaxed text-parchment/80 sm:mt-10 sm:text-2xl"
           >
-            A beautiful soul deserves a celebration as extraordinary as they are.
+            Happy birthday, {birthdayContent.nickname}. This little world is here to celebrate you.
           </motion.p>
           <motion.button
             type="button"
@@ -231,7 +261,7 @@ const OurStory = ({ onReplay }) => {
             className="scroll-cue absolute bottom-8 z-10 inline-flex flex-col items-center gap-3 border-0 bg-transparent text-[9px] uppercase tracking-[0.25em] text-gold/80 transition-colors hover:text-ivory"
             aria-label="Scroll to the memories"
           >
-            <span>Scroll to discover</span>
+            <span>Begin the story</span>
             <span className="scroll-cue-line" aria-hidden="true" />
           </motion.button>
         </section>
@@ -240,6 +270,7 @@ const OurStory = ({ onReplay }) => {
         <motion.section
           ref={memoriesRef}
           id="memories"
+          aria-labelledby="birthday-memories-title"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
@@ -247,30 +278,63 @@ const OurStory = ({ onReplay }) => {
           className="mb-32 px-margin-mobile md:px-margin-desktop overflow-hidden relative scroll-mt-28"
         >
           <div className="relative select-none text-center mb-12">
-            <p className="font-sans text-[10px] uppercase tracking-[0.32em] text-gold/80 mb-4">The little things we keep</p>
-            <h2 className="font-serif text-4xl md:text-6xl text-center mb-4 text-ivory font-normal tracking-tight">
-              A life in <span className="hero-title-italic">moments.</span>
+            <p className="font-sans text-[10px] uppercase tracking-[0.32em] text-gold/80 mb-4">Chapter 02 · A collection to make your own</p>
+            <h2 id="birthday-memories-title" className="font-serif text-4xl md:text-6xl text-center mb-4 text-ivory font-normal tracking-tight">
+              Beautiful <span className="hero-title-italic">memories.</span>
             </h2>
             <p className="mx-auto max-w-lg font-serif text-lg leading-relaxed text-parchment/65">
-              The kind of moments that stay with us long after the day is done.
+              A place for the photographs and moments you choose to keep close.
             </p>
           </div>
           
-          <div className="flex gap-8 overflow-x-auto pb-10 pt-2 px-4 no-scrollbar snap-x snap-mandatory">
-            <MemoryCard
-              image={beachImg}
-              alt="Sunset beach memory photo"
-              title="A Walk to Remember"
-              description="The day the world stood still, wrapped in golden light."
-            />
-            <MemoryCard
-              image={cafeImg}
-              alt="Cozy cafe memory photo"
-              title="Quiet Evenings"
-              description="Coffee, candlelight, and a connection that transcends words."
-              offset={true}
-            />
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label="Scrollable birthday memory gallery"
+            className="flex gap-8 overflow-x-auto px-4 pb-10 pt-2 no-scrollbar snap-x snap-mandatory focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold"
+          >
+            {birthdayContent.memories.map((memory, index) => (
+              <MemoryCard
+                key={memory.title}
+                {...memory}
+                offset={index % 2 === 1}
+              />
+            ))}
             <MemoryCard isPlaceholder={true} />
+          </div>
+        </motion.section>
+
+        <motion.section
+          ref={littleThingsRef}
+          id="little-things"
+          aria-labelledby="little-things-title"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          className="relative mb-28 scroll-mt-28 px-margin-mobile py-12 md:px-margin-desktop lg:mb-36"
+        >
+          <div className="mx-auto max-w-5xl">
+            <div className="mb-12 text-center">
+              <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.32em] text-gold/80">Chapter 03 · The details that stay</p>
+              <h2 id="little-things-title" className="font-serif text-4xl font-normal tracking-tight text-ivory md:text-6xl">
+                Little things <span className="hero-title-italic">that matter.</span>
+              </h2>
+              <p className="mx-auto mt-5 max-w-xl font-serif text-lg leading-relaxed text-parchment/70">
+                The smallest details can hold the most meaning. Make these words your own.
+              </p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {birthdayContent.littleThings.map((prompt, index) => (
+                <article key={prompt} className="glass-panel rounded-2xl p-6 sm:p-8">
+                  <p className="chapter-marker mb-8 font-sans text-[10px] text-gold/80">0{index + 1} / 03</p>
+                  <p className="font-serif text-xl leading-relaxed text-parchment sm:text-2xl">{prompt}</p>
+                </article>
+              ))}
+            </div>
+            <p className="mt-5 text-center font-sans text-[10px] uppercase tracking-[0.16em] text-parchment/45">
+              Replace these prompts with details that are true to Your Name.
+            </p>
           </div>
         </motion.section>
 
@@ -278,6 +342,7 @@ const OurStory = ({ onReplay }) => {
         <motion.section
           ref={wishesRef}
           id="wishes"
+          aria-labelledby="birthday-wishes-title"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
@@ -285,16 +350,16 @@ const OurStory = ({ onReplay }) => {
           className="min-h-[65vh] flex flex-col items-center justify-center px-margin-mobile md:px-margin-desktop py-12 relative overflow-hidden scroll-mt-28"
         >
           <div className="select-none text-center z-10 mb-8">
-            <p className="font-sans text-[10px] uppercase tracking-[0.32em] text-gold/80 mb-4">A few words from the heart</p>
-            <h2 className="font-serif text-4xl md:text-6xl text-center mb-4 text-ivory font-normal tracking-tight">
-              Wishes in the Sky
+            <p className="font-sans text-[10px] uppercase tracking-[0.32em] text-gold/80 mb-4">Chapter 04 · A few words from the heart</p>
+            <h2 id="birthday-wishes-title" className="font-serif text-4xl md:text-6xl text-center mb-4 text-ivory font-normal tracking-tight">
+              Birthday <span className="hero-title-italic">wishes.</span>
             </h2>
             <p className="font-serif text-base md:text-lg text-parchment/70 max-w-xl mx-auto">
-              Choose a balloon and let a little birthday wish find its way to you.
+              Tap, click, or focus a balloon and press Enter to reveal a wish for Your Name.
             </p>
           </div>
 
-          <div className="relative w-full max-w-5xl h-[340px] sm:h-[440px] mx-auto z-10">
+          <div ref={wishesStageRef} data-balloon-stage className="relative w-full max-w-5xl h-[340px] sm:h-[440px] mx-auto z-10">
             {/* Multi-layered Satin Floating Balloons */}
             <AnimatePresence>
               {balloons.map((balloon) => (
@@ -317,6 +382,9 @@ const OurStory = ({ onReplay }) => {
               {poppedWishes.map((wish) => (
                 <motion.div
                   key={wish.id}
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
                   initial={{ opacity: 0, scale: 0.8, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.8, y: -20 }}
@@ -336,10 +404,11 @@ const OurStory = ({ onReplay }) => {
           </div>
         </motion.section>
 
-        {/* Grand Finale Letter Experience Section */}
+        {/* A Letter From the Heart */}
         <motion.section
-          ref={finaleRef}
-          id="finale"
+          ref={letterRef}
+          id="letter"
+          aria-labelledby="birthday-letter-title"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
@@ -348,9 +417,9 @@ const OurStory = ({ onReplay }) => {
         >
           {/* Section Header */}
           <div className="text-center mb-10 select-none z-10">
-            <p className="font-script text-3xl text-gold/80 mb-2">The Centerpiece</p>
-            <h2 className="font-serif text-4xl md:text-5xl text-parchment text-shimmer font-semibold">
-              A Personal Letter
+            <p className="font-sans text-[10px] uppercase tracking-[0.32em] text-gold/80 mb-3">Chapter 05 · A letter from the heart</p>
+            <h2 id="birthday-letter-title" className="font-serif text-4xl md:text-5xl text-parchment text-shimmer font-semibold">
+              A letter, just for you
             </h2>
           </div>
 
@@ -359,7 +428,7 @@ const OurStory = ({ onReplay }) => {
             <ParallaxTilt maxRotation={8} scale={1.02} className="w-full max-w-lg">
               <motion.button
                 type="button"
-                aria-label="Open the birthday letter"
+                aria-label={`Open the birthday letter for ${birthdayContent.recipient}`}
                 initial={{ y: 80, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 90 }}
@@ -393,8 +462,8 @@ const OurStory = ({ onReplay }) => {
                   </motion.div>
 
                   <div className="mt-8 text-center z-10">
-                    <p className="font-script text-3xl text-gold/90 mb-1">To My Dearest,</p>
-                    <p className="font-sans text-xs text-parchment/70 tracking-[0.2em] uppercase">Tap to unfold this letter</p>
+                    <p className="font-script text-3xl text-gold/90 mb-1">To {birthdayContent.recipient},</p>
+                    <p className="font-sans text-xs text-parchment/70 tracking-[0.2em] uppercase">Select to unfold this letter</p>
                   </div>
                 </div>
               </motion.button>
@@ -422,20 +491,11 @@ const OurStory = ({ onReplay }) => {
                 </div>
 
                 {/* Main Personal Message Text */}
-                <div className="font-serif text-xl sm:text-2xl text-[#2D2024] leading-[1.85] typewriter whitespace-pre-wrap select-none tracking-wide">
+                <div className="font-serif text-xl sm:text-2xl text-[#2D2024] leading-[1.85] typewriter whitespace-pre-wrap tracking-wide" aria-hidden="true">
                   {typewrittenText}
-                  {isTyping && <span className="inline-block w-1.5 h-6 bg-[#5A2936] animate-pulse ml-1" />}
+                  {isTyping && <span className="inline-block w-1.5 h-6 bg-[#701B3A] animate-pulse ml-1" aria-hidden="true" />}
                 </div>
-
-                {/* Handwritten Signature */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: typewrittenText.length > 50 ? 1 : 0, y: 0 }}
-                  transition={{ duration: 1.5 }}
-                  className="mt-8 text-right font-script text-3xl sm:text-4xl text-[#5A2936] select-none pr-4"
-                >
-                  With all my love.
-                </motion.div>
+                <p className="sr-only">{isLetterOpened ? letterText : ''}</p>
 
                 {/* Heart & Celebration Finale */}
                 <AnimatePresence>
@@ -451,13 +511,13 @@ const OurStory = ({ onReplay }) => {
                           xmlns="http://www.w3.org/2000/svg" 
                           viewBox="0 0 24 24" 
                           fill="currentColor" 
-                          className="w-12 h-12 text-[#5A2936] drop-shadow-[0_0_20px_rgba(142,90,99,0.6)] animate-pulse"
+                          className="w-12 h-12 text-[#701B3A] drop-shadow-[0_0_20px_rgba(112,27,58,0.6)] animate-pulse"
                         >
                           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                         </svg>
                       </div>
-                      <h2 className="font-serif text-3xl sm:text-4xl text-[#5A2936] font-semibold tracking-wide">
-                        Happy Birthday ❤️
+                      <h2 className="font-serif text-3xl sm:text-4xl text-[#701B3A] font-semibold tracking-wide">
+                        Happy Birthday, {birthdayContent.nickname}
                       </h2>
                     </motion.div>
                   )}
@@ -466,12 +526,51 @@ const OurStory = ({ onReplay }) => {
             </div>
           )}
 
+          <div className="mt-10 flex flex-wrap justify-center gap-4">
+            {isLetterOpened && (
+              <button
+                type="button"
+                onClick={handleReplayLetter}
+                disabled={isTyping}
+                className="rounded-full border border-gold/30 bg-gold/5 px-6 py-3 font-sans text-[10px] uppercase tracking-[0.16em] text-gold transition-colors hover:bg-gold/15 disabled:cursor-wait disabled:opacity-50"
+              >
+                Read the letter again
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => handleNavigate('finale')}
+              className="rounded-full border border-gold/30 bg-gold/10 px-6 py-3 font-sans text-[10px] uppercase tracking-[0.16em] text-gold transition-colors hover:bg-gold/20"
+            >
+              Continue to the finale
+            </button>
+          </div>
+        </motion.section>
+
+        {/* Grand Finale */}
+        <motion.section
+          ref={finaleRef}
+          id="finale"
+          aria-labelledby="birthday-finale-title"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+          className="flex min-h-[85vh] flex-col items-center justify-center px-margin-mobile py-20 relative scroll-mt-28 md:px-margin-desktop"
+        >
+          <div className="mb-10 text-center">
+            <p className="mb-3 font-sans text-[10px] uppercase tracking-[0.32em] text-gold/80">Chapter 06 · The grand finale</p>
+            <h2 id="birthday-finale-title" className="font-serif text-4xl font-normal tracking-tight text-ivory md:text-6xl">
+              A new chapter, <span className="hero-title-italic">all yours.</span>
+            </h2>
+          </div>
+
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-24 grid w-full max-w-5xl overflow-hidden rounded-2xl border border-gold/20 bg-[#100B0E]/80 shadow-[0_35px_100px_rgba(0,0,0,0.5)] md:grid-cols-[1.1fr_0.9fr]"
+            className="mt-2 grid w-full max-w-5xl overflow-hidden rounded-2xl border border-gold/20 bg-[#100B0E]/80 shadow-[0_35px_100px_rgba(0,0,0,0.5)] md:grid-cols-[1.1fr_0.9fr]"
           >
             <div className="relative min-h-[280px] overflow-hidden sm:min-h-[380px]">
               <img
@@ -483,12 +582,12 @@ const OurStory = ({ onReplay }) => {
               <div className="absolute inset-0 bg-gradient-to-t from-[#100B0E]/65 via-transparent to-transparent md:bg-gradient-to-r" />
             </div>
             <div className="flex flex-col justify-center px-7 py-10 text-center sm:px-12 md:text-left">
-              <p className="mb-4 font-sans text-[9px] uppercase tracking-[0.3em] text-gold">Here’s to your next chapter</p>
+              <p className="mb-4 font-sans text-[9px] uppercase tracking-[0.3em] text-gold">For {birthdayContent.recipient}</p>
               <h3 className="font-serif text-4xl font-normal leading-tight tracking-tight text-ivory sm:text-5xl">
                 Make a wish.<br /><span className="hero-title-italic">Then make it yours.</span>
               </h3>
               <p className="mt-5 max-w-sm font-serif text-lg leading-relaxed text-parchment/70">
-                May this year bring you more joy, more wonder, and all the little things that make life beautiful.
+                May the year ahead bring you joy, wonder, and the space to become even more yourself. Happy birthday, {birthdayContent.nickname}.
               </p>
             </div>
           </motion.div>
@@ -516,7 +615,7 @@ const OurStory = ({ onReplay }) => {
           Created with Love • 2026
         </div>
         <div className="text-gold font-serif text-lg tracking-widest order-1 sm:order-3 text-shimmer font-semibold uppercase">
-          priyanshu chakraborty
+          {birthdayContent.sender}
         </div>
       </footer>
     </div>

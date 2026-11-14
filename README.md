@@ -55,8 +55,8 @@ The project is designed around a premium visual identity featuring:
 - Glowing particles and personalized birthday wishes.
 
 ### 💌 3. Personal Birthday Story
-- Dedicated storytelling experience.
-- Multiple sections for memories, wishes, and special moments.
+- Six chapters: The Beginning, Beautiful Memories, Little Things That Matter, Birthday Wishes, A Letter From the Heart, and the Grand Finale.
+- Editable prompts for personal details, memories, wishes, and the letter.
 - Animated text and cinematic transitions.
 - Personal birthday message and finale.
 
@@ -89,6 +89,14 @@ The project is designed around a premium visual identity featuring:
 
 ---
 
+## ✍️ Personalizing the Experience
+
+Update [`src/content/birthdayContent.js`](./src/content/birthdayContent.js) to customize the recipient name and nickname, memory captions, little-things prompts, birthday wishes, and letter. The letter intentionally includes a clear placeholder for a personal note; replace it before sharing the site.
+
+The gallery currently uses sample scenes. Replace the image imports in the same file with photographs you have permission to share, and update their alt text to describe the actual images.
+
+---
+
 ## 🛠️ Tech Stack
 
 | Technology | Purpose |
@@ -117,19 +125,24 @@ Birthday/
 │   ├── components/
 │   │   ├── BackgroundShader.jsx
 │   │   ├── Balloon.jsx
+│   │   ├── MemoryCard.jsx
 │   │   ├── MusicControls.jsx
+│   │   ├── SideNavbar.jsx
 │   │   ├── TopNavbar.jsx
 │   │   └── MobileMenu.jsx
 │   │
 │   ├── context/
-│   │   └── AudioContext.jsx
+│   │   ├── AudioContext.jsx
+│   │   ├── audioContextValue.js
+│   │   └── useAudio.js
+│   ├── content/
+│   │   └── birthdayContent.js
 │   │
 │   ├── sections/
 │   │   ├── GiftReveal.jsx
 │   │   └── OurStory.jsx
 │   │
 │   ├── App.jsx
-│   ├── App.css
 │   ├── index.css
 │   └── main.jsx
 │
@@ -211,7 +224,7 @@ Rather than using overly bright colours and conventional birthday decorations, t
 **Design elements:**
 
 - Dark cinematic backgrounds.
-- Burgundy, champagne, and dusty rose colour palette.
+- Burgundy, wine, champagne, and soft ivory with selective pink and violet accents.
 - Soft gradients and glowing highlights.
 - Layered animations and floating elements.
 - Smooth typography and visual hierarchy.

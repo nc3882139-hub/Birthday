@@ -3,27 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --color-ivory: #F8F3EC;
+  --color-ivory: #F8F0E7;
   --color-parchment: #EFE4D5;
-  --color-gold: #C9A98A;
+  --color-gold: #D6B77A;
   --color-dusty-rose: #D9A0AA;
-  --color-wine: #5A2936;
+  --color-wine: #701B3A;
+  --color-burgundy: #4A1028;
   --color-wine-dark: #100B0E;
-  --color-midnight: #080808;
+  --color-midnight: #080709;
 }
 
 @layer base {
   html {
     scroll-behavior: auto;
-    background: #080808;
+    background: #080709;
+    overflow-x: clip;
   }
 
   body {
     min-height: 100vh;
+    min-width: 320px;
     background-color: var(--color-midnight);
-    background: radial-gradient(ellipse at 50% 4%, #180D12 0%, #100B0E 43%, #080808 100%);
+    background: radial-gradient(ellipse at 50% 4%, #180D12 0%, #100B0E 43%, #080709 100%);
     color: var(--color-parchment);
-    overflow-x: hidden;
+    overflow-x: clip;
     scroll-behavior: auto;
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -42,9 +45,8 @@
       radial-gradient(circle at 50% 70%, rgba(90, 41, 54, 0.12), transparent 45%);
   }
 
-  button:focus-visible,
-  [role="button"]:focus-visible {
-    outline: 1px solid var(--color-gold);
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
     outline-offset: 4px;
   }
 
@@ -113,7 +115,7 @@
     left: 67%;
     width: 3px;
     height: 3px;
-    background: #C9A98A;
+    background: #D6B77A;
     box-shadow: 0 0 18px 3px rgba(201, 169, 138, 0.45);
   }
 
@@ -152,18 +154,18 @@
     appearance: none;
     width: 10px;
     height: 10px;
-    border: 1px solid #F8F3EC;
+    border: 1px solid #F8F0E7;
     border-radius: 50%;
-    background: #C9A98A;
+    background: #D6B77A;
     box-shadow: 0 0 10px rgba(201, 169, 138, 0.4);
   }
 
   .music-volume-slider::-moz-range-thumb {
     width: 9px;
     height: 9px;
-    border: 1px solid #F8F3EC;
+    border: 1px solid #F8F0E7;
     border-radius: 50%;
-    background: #C9A98A;
+    background: #D6B77A;
     box-shadow: 0 0 10px rgba(201, 169, 138, 0.4);
   }
 
@@ -181,6 +183,10 @@
     border-radius: 48% 52% 47% 53% / 39% 42% 58% 61%;
     transform: perspective(420px) rotateY(-7deg);
     transition: filter 700ms ease, box-shadow 700ms ease;
+  }
+
+  .balloon-button {
+    touch-action: manipulation;
   }
 
   .balloon-shape-round {
@@ -280,6 +286,11 @@
 
   .font-serif-display {
     font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+  }
+
+  .chapter-marker {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.18em;
   }
 }
 
@@ -392,7 +403,7 @@
 }
 
 .text-shimmer {
-  background: linear-gradient(90deg, #C9A98A 0%, #F8F3EC 25%, #E5CFB7 50%, #F8F3EC 75%, #C9A98A 100%);
+  background: linear-gradient(90deg, #D6B77A 0%, #F8F0E7 25%, #E5CFB7 50%, #F8F0E7 75%, #D6B77A 100%);
   background-size: 280% auto;
   color: transparent;
   -webkit-background-clip: text;
@@ -402,7 +413,7 @@
 }
 
 .text-shimmer-rose {
-  background: linear-gradient(90deg, #8E5A63 0%, #EFE4D5 30%, #C9A98A 50%, #EFE4D5 70%, #8E5A63 100%);
+  background: linear-gradient(90deg, #701B3A 0%, #EFE4D5 30%, #D6B77A 50%, #EFE4D5 70%, #701B3A 100%);
   background-size: 280% auto;
   color: transparent;
   -webkit-background-clip: text;

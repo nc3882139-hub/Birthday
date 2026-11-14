@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAudio } from '../context/AudioContext';
+import { useAudio } from '../context/useAudio';
 import { VolumeOffIcon, VolumeOnIcon } from './icons';
 
 const MusicControls = ({ placement = 'floating' }) => {
@@ -19,7 +19,7 @@ const MusicControls = ({ placement = 'floating' }) => {
         onClick={togglePlay}
         aria-label={isPlaying ? 'Pause ambient music' : 'Play ambient music'}
         aria-pressed={isPlaying}
-        className="grid h-7 w-7 place-items-center rounded-full border border-gold/25 bg-gold/5 text-gold transition-colors hover:bg-gold/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold sm:h-8 sm:w-8"
+        className="grid h-9 w-9 place-items-center rounded-full border border-gold/25 bg-gold/5 text-gold transition-colors hover:bg-gold/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold sm:h-10 sm:w-10"
       >
         {isPlaying ? (
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-3.5 w-3.5">
@@ -37,7 +37,7 @@ const MusicControls = ({ placement = 'floating' }) => {
         onClick={toggleMute}
         aria-label={isMuted ? 'Unmute ambient music' : 'Mute ambient music'}
         aria-pressed={isMuted}
-        className="grid h-7 w-7 place-items-center rounded-full border border-gold/15 bg-transparent text-gold/80 transition-colors hover:bg-gold/10 hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold sm:h-8 sm:w-8"
+        className="grid h-9 w-9 place-items-center rounded-full border border-gold/15 bg-transparent text-gold/80 transition-colors hover:bg-gold/10 hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold sm:h-10 sm:w-10"
       >
         {isMuted ? <VolumeOffIcon className="h-4 w-4" /> : <VolumeOnIcon className="h-4 w-4" />}
       </button>

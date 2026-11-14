@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAudio } from '../context/AudioContext';
-import { SparkleIcon, PhotoIcon, HeartIcon, CloseIcon } from './icons';
+import { useAudio } from '../context/useAudio';
+import { CloseIcon } from './icons';
+import { birthdayContent } from '../content/birthdayContent';
 
 const MobileMenu = ({ isOpen, onClose, activeSection, onNavigate }) => {
   const { playTick } = useAudio();
@@ -43,13 +44,6 @@ const MobileMenu = ({ isOpen, onClose, activeSection, onNavigate }) => {
     };
   }, [isOpen]);
 
-  const chapters = [
-    { label: 'The Beginning', targetId: 'beginning', icon: <SparkleIcon className="w-5 h-5 text-gold" /> },
-    { label: 'Memories', targetId: 'memories', icon: <PhotoIcon className="w-5 h-5 text-gold" /> },
-    { label: 'Wishes', targetId: 'wishes', icon: <HeartIcon className="w-5 h-5 text-gold" /> },
-    { label: 'The Letter', targetId: 'finale', icon: <SparkleIcon className="w-5 h-5 text-gold" /> }
-  ];
-
   const handleNavigate = (targetId) => {
     playTick();
     onNavigate(targetId);
@@ -81,11 +75,11 @@ const MobileMenu = ({ isOpen, onClose, activeSection, onNavigate }) => {
             role="dialog"
             aria-modal="true"
             aria-label="Story navigation"
-            initial={{ x: '100%', filter: 'blur(8px)' }}
-            animate={{ x: 0, filter: 'blur(0px)' }}
-            exit={{ x: '100%', filter: 'blur(8px)' }}
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 220 }}
-            className="fixed right-0 top-0 h-full w-80 bg-wine-dark/95 backdrop-blur-3xl border-l border-gold/20 p-8 flex flex-col z-[100] shadow-[0_0_60px_rgba(0,0,0,0.9)] md:hidden overflow-y-auto"
+            className="fixed right-0 top-0 z-[100] flex h-full max-h-[100svh] w-[min(20rem,calc(100vw-1rem))] flex-col overflow-y-auto border-l border-gold/20 bg-wine-dark/95 p-6 shadow-[0_0_60px_rgba(0,0,0,0.9)] backdrop-blur-3xl xl:hidden sm:p-8"
           >
             <div className="flex justify-between items-center mb-10 pb-4 border-b border-gold/15">
               <div>
@@ -102,8 +96,8 @@ const MobileMenu = ({ isOpen, onClose, activeSection, onNavigate }) => {
             </div>
 
             {/* Navigation Items */}
-            <div className="flex flex-col gap-4 flex-grow">
-              {chapters.map((chapter, index) => {
+            <div className="flex flex-grow flex-col gap-2">
+              {birthdayContent.chapters.map((chapter, index) => {
                 const isActive = activeSection === chapter.targetId;
                 return (
                   <motion.button
@@ -113,23 +107,24 @@ const MobileMenu = ({ isOpen, onClose, activeSection, onNavigate }) => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.08, ease: 'easeOut' }}
                     onClick={() => handleNavigate(chapter.targetId)}
-                    className={`flex w-full items-center gap-4 rounded-2xl border-0 bg-transparent p-4 text-left cursor-pointer transition-all duration-300 min-h-[54px] select-none ${
+                    aria-current={isActive ? 'location' : undefined}
+                    className={`flex min-h-[52px] w-full items-center gap-4 rounded-2xl border-0 bg-transparent p-3 text-left cursor-pointer transition-all duration-300 select-none ${
                       isActive
                         ? 'text-gold border-r-2 border-gold bg-gold/10 pl-5'
                         : 'text-parchment/70 hover:bg-gold/5 hover:text-gold'
                     }`}
                   >
-                    <div className="flex-shrink-0">
-                      {chapter.icon}
-                    </div>
-                    <span className="font-sans text-xs uppercase tracking-[0.15em]">{chapter.label}</span>
+                    <span className="chapter-marker grid h-8 w-8 flex-shrink-0 place-items-center rounded-full border border-gold/20 bg-gold/5 font-sans text-[9px] text-gold" aria-hidden="true">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span className="font-sans text-xs uppercase tracking-[0.12em]">{chapter.label}</span>
                   </motion.button>
                 );
               })}
             </div>
 
             <button
-              onClick={() => handleNavigate('finale')}
+              onClick={() => handleNavigate('letter')}
               className="w-full py-4 mt-8 bg-gold/15 border border-gold/30 text-gold font-sans text-xs uppercase tracking-[0.18em] rounded-full hover:bg-gold hover:text-midnight transition-all duration-300 btn-sheen cursor-pointer"
             >
               Read Letter

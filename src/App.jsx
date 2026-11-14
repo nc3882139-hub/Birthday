@@ -39,7 +39,7 @@ function AppContent() {
   }, [view]);
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#080808] text-[#F8F3EC]">
+    <div className="relative min-h-screen w-full bg-[#080709] text-[#F8F0E7]">
       {/* Background Shader is mounted globally so it animates continuously */}
       <BackgroundShader />
 

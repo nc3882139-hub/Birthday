@@ -7,27 +7,22 @@ const MemoryCard = ({
   alt,
   title,
   description,
+  label = 'A memory to keep',
   offset = false,
   isPlaceholder = false
 }) => {
-  const getLabel = () => {
-    if (title === 'A Walk to Remember') return 'GOLDEN HOUR';
-    if (title === 'Quiet Evenings') return 'AFTER HOURS';
-    return 'A MEMORY';
-  };
-
   if (isPlaceholder) {
     return (
-      <ParallaxTilt className="min-w-[min(82vw,320px)] md:min-w-[360px] h-[390px] md:h-[460px] flex-shrink-0 snap-center">
+      <ParallaxTilt className="w-[min(82vw,320px)] md:w-[360px] h-[390px] md:h-[460px] flex-shrink-0 snap-center">
         <div className="w-full h-full glass-panel rounded-2xl overflow-hidden group relative flex items-center justify-center bg-wine-dark/30 border border-gold/15 shadow-2xl transition-all duration-500">
           <div className="text-center p-6" style={{ transform: 'translateZ(25px)' }}>
             <div className="w-16 h-16 mx-auto rounded-full bg-gold/10 border border-gold/25 flex items-center justify-center mb-5 group-hover:bg-gold group-hover:text-midnight group-hover:scale-110 transition-all duration-500 shadow-md">
               <PhotoIcon className="w-7 h-7 text-gold group-hover:text-midnight transition-colors duration-500" />
             </div>
             <h3 className="font-serif text-2xl text-parchment mb-2 group-hover:text-gold transition-colors duration-500 select-none font-semibold">
-              More Moments Ahead
+              Make room for another memory
             </h3>
-            <p className="font-script text-xl text-gold/80 select-none">Our story is just beginning...</p>
+            <p className="font-script text-xl text-gold/80 select-none">Add the next moment when you are ready.</p>
           </div>
         </div>
       </ParallaxTilt>
@@ -36,7 +31,7 @@ const MemoryCard = ({
 
   return (
     <ParallaxTilt
-      className={`min-w-[min(82vw,320px)] md:min-w-[360px] h-[390px] md:h-[460px] flex-shrink-0 snap-center ${
+      className={`w-[min(82vw,320px)] md:w-[360px] h-[390px] md:h-[460px] flex-shrink-0 snap-center ${
         offset ? 'md:mt-12' : ''
       }`}
     >
@@ -48,7 +43,7 @@ const MemoryCard = ({
         
         {/* Floating Editorial Stamp Badge */}
         <div className="absolute top-5 left-5 z-20 px-3.5 py-1.5 rounded-full border border-gold/30 bg-midnight/75 backdrop-blur-md text-[9px] font-medium text-gold tracking-[0.22em] shadow-lg uppercase select-none font-sans">
-          {getLabel()}
+          {label}
         </div>
 
         {/* Gradient shadow overlay for text readability */}

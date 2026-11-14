@@ -307,7 +307,7 @@ const BackgroundShader = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-full overflow-hidden z-0 pointer-events-none mix-blend-screen opacity-70">
+    <div aria-hidden="true" className="fixed inset-0 w-full h-full overflow-hidden z-0 pointer-events-none mix-blend-screen opacity-70">
       <canvas ref={canvasRef} className="block w-full h-full" />
     </div>
   );

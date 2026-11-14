@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAudio } from '../context/AudioContext';
+import { useAudio } from '../context/useAudio';
 
 // Color map for satin/foil balloons
 const BALLOON_PALETTES = {
@@ -66,7 +66,7 @@ const Balloon = ({
   depth = 'mg', // 'bg' | 'mg' | 'fg'
   onPop
 }) => {
-  const { playTick } = useAudio();
+  const { playPop } = useAudio();
   const [isPopped, setIsPopped] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [particles, setParticles] = useState([]);
@@ -118,7 +118,7 @@ const Balloon = ({
   const handleClick = (e) => {
     if (isPopped) return;
     setIsPopped(true);
-    playTick();
+    playPop();
     
     // Spawn glowing particle burst
     const spawnCount = 12;
@@ -134,13 +134,18 @@ const Balloon = ({
 
     if (onPop) {
       const rect = e.currentTarget.getBoundingClientRect();
-      const parentRect = e.currentTarget.parentElement.getBoundingClientRect();
-      const x = rect.left - parentRect.left + rect.width / 2;
-      const y = rect.top - parentRect.top;
+      const stage = e.currentTarget.closest('[data-balloon-stage]');
+      if (!stage) {
+        console.error('Interactive balloons must be rendered inside a balloon stage.');
+        return;
+      }
+      const stageRect = stage.getBoundingClientRect();
+      const x = rect.left - stageRect.left + rect.width / 2;
+      const y = rect.top - stageRect.top + rect.height / 2;
 
       popTimer.current = window.setTimeout(() => {
         onPop(id, wish, x, y);
-      }, 350);
+      }, 1250);
     }
   };
 
@@ -163,7 +168,10 @@ const Balloon = ({
             aria-hidden={!interactive}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onFocus={() => setIsHovered(true)}
+            onBlur={() => setIsHovered(false)}
             aria-label={wish ? `Pop balloon to reveal: ${wish}` : 'Pop decorative balloon'}
+            whileTap={interactive ? { scale: balloonScale * 0.9 } : undefined}
             initial={{ y: 200, opacity: 0 }}
             animate={{
               y: [0, -floatRange, -floatRange * 0.42, 0],
@@ -203,7 +211,7 @@ const Balloon = ({
               filter: depthConfig.blur,
               transformOrigin: 'bottom center'
             }}
-            className={`w-full h-full relative group flex flex-col items-center justify-center border-0 bg-transparent p-0 ${
+            className={`balloon-button w-full h-full relative group flex flex-col items-center justify-center border-0 bg-transparent p-0 ${
               interactive
                 ? 'cursor-pointer pointer-events-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold'
                 : 'pointer-events-none'
